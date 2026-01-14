@@ -1,4 +1,4 @@
-﻿namespace TRADE.SHARED.SERVICE
+﻿namespace Shared.Telegram
 {
     public sealed class TelegramTopic
     {

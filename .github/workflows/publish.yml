@@ -1,0 +1,48 @@
+﻿name: Publish Shared Packages
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Pack all shared projects
+        run: dotnet pack Solution.sln -c Release --no-build
+
+      - name: Push packages to nuget.org (skip duplicate)
+        id: push
+        run: |
+          set -e
+
+          echo "Pushing packages to nuget.org..."
+          dotnet nuget push "**/*.nupkg" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+          echo "push_status=success" >> $GITHUB_OUTPUT
+
+      - name: Notify Telegram (success)
+        if: steps.push.outputs.push_status == 'success'
+        run: |
+          MESSAGE="✅ NuGet publish SUCCESS\n\nRepo: ${{ github.repository }}\nTag: ${{ github.ref_name }}\nCommit: ${{ github.sha }}"
+
+          curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+            -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+            -d text="$MESSAGE"

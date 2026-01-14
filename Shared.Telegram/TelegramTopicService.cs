@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Text;
 
-namespace TRADE.SHARED.SERVICE
+namespace Shared.Telegram
 {
     public class TelegramTopicService : ITelegramTopicService
     {

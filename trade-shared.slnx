@@ -1,3 +1,8 @@
 <Solution>
-  <Project Path="TRADE.SHARED.SERVICE/TRADE.SHARED.SERVICE.csproj" />
+  <Folder Name="/cmp/">
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="Shared.Kafka/Shared.Kafka.csproj" Id="4665ae76-59b9-4e25-8f95-56360b5dcdcb" />
+  <Project Path="Shared.Logger/Shared.Logger.csproj" Id="10be6f47-d8f5-4fe5-89c7-b6fcf961b8e3" />
+  <Project Path="Shared.Telegram/Shared.Telegram.csproj" Id="501a6913-d13d-4abf-a1b6-71ef11a88ee0" />
 </Solution>
