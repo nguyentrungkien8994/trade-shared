@@ -23,7 +23,7 @@ jobs:
         run: dotnet restore
 
       - name: Pack all shared projects
-        run: dotnet pack Solution.sln -c Release --no-build
+        run: dotnet pack trade-shared -c Release --no-build
 
       - name: Push packages to nuget.org (skip duplicate)
         id: push
