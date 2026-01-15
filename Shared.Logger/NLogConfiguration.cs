@@ -1,7 +1,7 @@
 ﻿using NLog.Config;
 using NLog.Targets;
 
-namespace TRADE.SHARED.KAFKA;
+namespace Shared.Logger;
 
 public class NLogConfiguration
 {
