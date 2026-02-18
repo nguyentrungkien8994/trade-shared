@@ -5,15 +5,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<PackageId>Kai.Shared.Kafka</PackageId>
+		<PackageId>Kai.Shared.OpenAI</PackageId>
 		<Version>1.0.1</Version>
 		<Authors>Kai</Authors>
 		<RepositoryUrl>https://github.com/nguyentrungkien8994/trade-shared</RepositoryUrl>
 	</PropertyGroup>
-	
 	<ItemGroup>
+		<PackageReference Include="OpenAI" />
 		<PackageReference Include="Microsoft.Extensions.Options" />
-		<PackageReference Include="Newtonsoft.Json" />
-		<PackageReference Include="Confluent.Kafka" />
 	</ItemGroup>
 </Project>

@@ -5,6 +5,8 @@
   <Project Path="Shared.Helper/Shared.Helper.csproj" Id="753dc159-5859-47c8-a3f4-18fc45ff67ff" />
   <Project Path="Shared.Kafka/Shared.Kafka.csproj" Id="4665ae76-59b9-4e25-8f95-56360b5dcdcb" />
   <Project Path="Shared.Logger/Shared.Logger.csproj" Id="10be6f47-d8f5-4fe5-89c7-b6fcf961b8e3" />
+  <Project Path="Shared.MongoDB.Entities/Shared.MongoDB.Entities.csproj" Id="349e4db6-dcb4-4b95-a1c7-05da6821581e" />
   <Project Path="Shared.MongoDB/Shared.MongoDB.csproj" Id="50a9e110-46fd-4c6e-a9bc-59deab04df56" />
+  <Project Path="Shared.OpenAI/Shared.OpenAI.csproj" Id="7c1af1ba-736d-4e8f-8bbc-cf095d9894ea" />
   <Project Path="Shared.Telegram/Shared.Telegram.csproj" Id="501a6913-d13d-4abf-a1b6-71ef11a88ee0" />
 </Solution>
