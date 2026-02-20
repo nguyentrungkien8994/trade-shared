@@ -2,6 +2,7 @@
   <Folder Name="/cmp/">
     <File Path="Directory.Packages.props" />
   </Folder>
+  <Project Path="Shared.AppTest/Shared.AppTest.csproj" Id="3b5d293a-3eca-4c08-9e8e-ce7c4de821f4" />
   <Project Path="Shared.Helper/Shared.Helper.csproj" Id="753dc159-5859-47c8-a3f4-18fc45ff67ff" />
   <Project Path="Shared.Kafka/Shared.Kafka.csproj" Id="4665ae76-59b9-4e25-8f95-56360b5dcdcb" />
   <Project Path="Shared.Logger/Shared.Logger.csproj" Id="10be6f47-d8f5-4fe5-89c7-b6fcf961b8e3" />
