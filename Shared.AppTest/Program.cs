@@ -12,6 +12,7 @@ string mongoDbDatabase = builder.Configuration["MONGODB_DATABASE"];
 
 // Kafka options
 builder.Services.AddConfluentKafka(kafka_bootstrap, kafka_group, kafka_topic);
+builder.Services.AddOpenAI();
 
 // Background worker
 builder.Services.AddHostedService<KafkaConsumerWorker>();

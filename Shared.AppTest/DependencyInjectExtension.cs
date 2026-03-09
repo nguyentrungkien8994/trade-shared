@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Shared.Kafka;
+using Shared.OpenAI;
 
 namespace Shared.AppTest
 {
@@ -23,6 +24,23 @@ namespace Shared.AppTest
             );
             services.AddSingleton<IKafkaConsumer, KafkaConsumer>();
             services.AddSingleton<IKafkaProducer, KafkaProducer>();
+        }
+
+        /// <summary>
+        /// add openAI
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddOpenAI(this IServiceCollection services)
+        {
+            services.AddSingleton<IOptions<OpenAiParserOptions>>(
+                Options.Create(new OpenAiParserOptions
+                {
+                    ApiKey = "",
+                    MaxTokens = 128
+                })
+            );
+
+            services.AddSingleton<ITradeCommandParser, OpenAiTradeCommandParser>();
         }
 
         ///// <summary>

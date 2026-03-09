@@ -38,6 +38,7 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         - Do NOT guess randomly.
         - Use PRICE RELATION rules to determine side when keywords are missing.
         - Prefer DEFAULT behaviors over returning null.
+        - Do NOT create a trade order unless at least (symbol + entry) OR (symbol + stop_loss) is present, or side (buy/sell/long/short) is explicit.
 
         --------------------------------------------------
         MARKET RULES (STRICT):
@@ -135,7 +136,11 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         var content = completion.Value.Content[0].Text;
 
         if (string.IsNullOrWhiteSpace(content))
-            return ParseTradeResult.Fail("Empty response from OpenAI");
+        {
+            ParseTradeResult result = ParseTradeResult.Fail("Empty response from OpenAI");
+            result.ParserType = "Text";
+            return result;
+        }
 
         try
         {
@@ -147,13 +152,20 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
                 });
 
             if (command == null || string.IsNullOrWhiteSpace(command.Symbol))
-                return ParseTradeResult.Fail("No trade command detected");
-
-            return ParseTradeResult.Success(command);
+            {
+                ParseTradeResult result = ParseTradeResult.Fail("No trade command detected");
+                result.ParserType = "Text";
+                return result;
+            }
+            ParseTradeResult res = ParseTradeResult.Success(command);
+            res.ParserType = "Text";
+            return res;
         }
         catch (Exception ex)
         {
-            return ParseTradeResult.Fail($"Parse error: {ex.Message}");
+            ParseTradeResult result = ParseTradeResult.Fail($"Parse error: {ex.Message}");
+            result.ParserType = "Text";
+            return result; 
         }
     }
 
@@ -239,7 +251,12 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
             var content = completion.Value.Content[0].Text;
 
             if (string.IsNullOrWhiteSpace(content))
-                return ParseTradeResult.Fail("Empty response from OpenAI");
+            {
+                ParseTradeResult result = ParseTradeResult.Fail("Empty response from OpenAI"); 
+                result.ParserType = "Image";
+                return result;
+            }
+
 
             try
             {
@@ -251,13 +268,20 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
                     });
 
                 if (command == null || string.IsNullOrWhiteSpace(command.Symbol))
-                    return ParseTradeResult.Fail("No trade command detected");
-
-                return ParseTradeResult.Success(command);
+                {
+                    ParseTradeResult result = ParseTradeResult.Fail("No trade command detected");
+                    result.ParserType = "Image";
+                    return result;
+                }
+                ParseTradeResult rs = ParseTradeResult.Success(command);
+                rs.ParserType = "Image";
+                return rs;
             }
             catch (Exception ex)
             {
-                return ParseTradeResult.Fail($"Parse error: {ex.Message}");
+                ParseTradeResult result = ParseTradeResult.Fail($"Parse error: {ex.Message}");
+                result.ParserType = "Image";
+                return result;
             }
         }
         catch (Exception)

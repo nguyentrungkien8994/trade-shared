@@ -57,7 +57,8 @@ namespace Shared.Telegram
             {
                 chat_id = _config.ChatId,
                 message_thread_id = topicId,
-                text = message
+                text = message,
+                parse_mode="HTML"
             };
 
             var content = BuildJsonContent(payload);

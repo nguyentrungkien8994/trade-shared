@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Shared.Kafka;
+using Shared.OpenAI;
 using System.Reflection;
 
 namespace Shared.AppTest
@@ -16,10 +17,13 @@ namespace Shared.AppTest
         private readonly IOptions<KafkaOptions> _options;
         private readonly IServiceProvider _provider;
 
+        private readonly ITradeCommandParser _tradeCommandParser;
+
         public KafkaConsumerWorker(IKafkaConsumer kafkaConsumer,
             ILogger<KafkaConsumerWorker> logger,
             IOptions<KafkaOptions> options,
             IServiceProvider provider,
+            ITradeCommandParser tradeCommandParser,
             IKafkaProducer kafkaProducer)
         {
             _kafkaConsumer = kafkaConsumer;
@@ -28,12 +32,14 @@ namespace Shared.AppTest
             _provider = provider;
           
             _kafkaProducer = kafkaProducer;
+            _tradeCommandParser = tradeCommandParser;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
             {
+                //var rs = await _tradeCommandParser.ParseAsync("eth spot 1947 5% stop");
                 await _kafkaProducer.ProduceAsync("test", "test", "test");
                 //await _kafkaConsumer.ConsumeAsync(_options.Value.Topic, HandleMessage, stoppingToken);
             }

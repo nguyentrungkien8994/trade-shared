@@ -3,6 +3,7 @@
 public sealed class ParseTradeResult
 {
     public bool IsSuccess { get; init; }
+    public string? ParserType { get; set; }
     public TradeCommand? Command { get; init; }
     public string? Error { get; init; }
 
