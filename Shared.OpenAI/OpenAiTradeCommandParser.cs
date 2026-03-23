@@ -35,11 +35,19 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         Extract ONE trade instruction from a SINGLE raw message.
 
         IMPORTANT PRINCIPLES:
-        - Do NOT guess randomly.
-        - Use PRICE RELATION rules to determine side when keywords are missing.
-        - Prefer DEFAULT behaviors over returning null.
-        - Do NOT create a trade order unless at least (symbol + entry) OR (symbol + stop_loss) is present, or side (buy/sell/long/short) is explicit.
-
+        1. REQUIRED FIELDS:
+           - symbol (e.g., BTC, ETH, SOL)
+           - side (LONG or SHORT)
+           - entry or entryRange
+        
+        2. HARD CONSTRAINTS:
+           - If symbol is NOT explicitly present in the message → return INVALID_SIGNAL
+           - DO NOT infer or guess symbol from context
+           - DO NOT assume BTC by default
+           - DO NOT hallucinate missing fields
+        
+        3. VALIDATION:
+           - If any required field is missing → return INVALID_SIGNAL
         --------------------------------------------------
         MARKET RULES (STRICT):
 
@@ -76,7 +84,7 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         --------------------------------------------------
 
         SIDE DETERMINATION RULES (CRITICAL):
-
+       
         1. If message explicitly contains:
             • "buy limit" or "limit buy"   → side = BUY_LIMIT
             • "sell limit" or "limit sell" → side = SELL_LIMIT
@@ -109,16 +117,19 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         --------------------------------------------------
 
         JSON SCHEMA:
-
-        {
-          "symbol": string,
-          "market": "SPOT" | "FUTURES",
-          "side": "BUY" | "SELL" | "BUY_LIMIT" | "SELL_LIMIT",
-          "entry": number | null,
-          "entryRange": { "min": number, "max": number } | null,
-          "stopLoss": number | null,
-          "takeProfit": number | null
-        }
+        [
+            {
+              "symbol": string,
+              "market": "SPOT" | "FUTURES",
+              "side": "BUY" | "SELL" | "BUY_LIMIT" | "SELL_LIMIT",
+              "risk": number | null,
+              "entry": number | null,
+              "size":number|null,
+              "entryRange": { "min": number, "max": number } | null,
+              "stopLoss": number | null,
+              "takeProfit": number | null
+            }
+        ]
         """;
         var completion = await _client.CompleteChatAsync(
             new ChatMessage[]
@@ -135,7 +146,7 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
 
         var content = completion.Value.Content[0].Text;
 
-        if (string.IsNullOrWhiteSpace(content))
+        if (string.IsNullOrWhiteSpace(content) || content == "INVALID_SIGNAL")
         {
             ParseTradeResult result = ParseTradeResult.Fail("Empty response from OpenAI");
             result.ParserType = "Text";
@@ -144,14 +155,14 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
 
         try
         {
-            var command = JsonSerializer.Deserialize<TradeCommand>(
+            var command = JsonSerializer.Deserialize<TradeCommand[]>(
                 content,
                 new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-            if (command == null || string.IsNullOrWhiteSpace(command.Symbol))
+            if (command == null)
             {
                 ParseTradeResult result = ParseTradeResult.Fail("No trade command detected");
                 result.ParserType = "Text";
@@ -165,7 +176,7 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         {
             ParseTradeResult result = ParseTradeResult.Fail($"Parse error: {ex.Message}");
             result.ParserType = "Text";
-            return result; 
+            return result;
         }
     }
 
@@ -190,16 +201,19 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         --------------------------------------------------
 
         JSON SCHEMA:
-
-        {
-          "symbol": string,
-          "market": "SPOT" | "FUTURES",
-          "side": "BUY" | "SELL" | "BUY_LIMIT" | "SELL_LIMIT",
-          "entry": number | null,
-          "entryRange": { "min": number, "max": number } | null,
-          "stopLoss": number | null,
-          "takeProfit": number | null
-        }
+        [
+            {
+              "symbol": string,
+              "market": "SPOT" | "FUTURES",
+              "side": "BUY" | "SELL" | "BUY_LIMIT" | "SELL_LIMIT",
+              "risk": number | null,
+              "size":number | null,
+              "entry": number | null,
+              "entryRange": { "min": number, "max": number } | null,
+              "stopLoss": number | null,
+              "takeProfit": number | null
+            }
+        ]
         """;
             //using var http = new HttpClient();
             //http.DefaultRequestHeaders.Authorization =
@@ -252,7 +266,7 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
 
             if (string.IsNullOrWhiteSpace(content))
             {
-                ParseTradeResult result = ParseTradeResult.Fail("Empty response from OpenAI"); 
+                ParseTradeResult result = ParseTradeResult.Fail("Empty response from OpenAI");
                 result.ParserType = "Image";
                 return result;
             }
@@ -260,14 +274,14 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
 
             try
             {
-                var command = JsonSerializer.Deserialize<TradeCommand>(
+                var command = JsonSerializer.Deserialize<TradeCommand[]>(
                     content,
                     new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
 
-                if (command == null || string.IsNullOrWhiteSpace(command.Symbol))
+                if (command == null)
                 {
                     ParseTradeResult result = ParseTradeResult.Fail("No trade command detected");
                     result.ParserType = "Image";

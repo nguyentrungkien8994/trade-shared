@@ -5,6 +5,8 @@ public sealed class TradeCommand
     public string Symbol { get; init; } = default!;
     public string Side { get; init; } = default!;     // BUY / SELL
     public decimal? Entry { get; init; }
+    public decimal? Size { get; init; }
+    public decimal? Risk { get; init; }
     public EntryRange? EntryRange { get; init; }
     public decimal? StopLoss { get; init; }
     public decimal? TakeProfit { get; init; }
