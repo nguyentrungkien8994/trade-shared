@@ -13,26 +13,28 @@ namespace Shared.AppTest
     {
         private readonly ILogger<KafkaConsumerWorker> _logger;
         //private readonly IKafkaConsumer _kafkaConsumer;
-        private readonly IKafkaProducer _kafkaProducer;
-        private readonly IOptions<KafkaOptions> _options;
-        private readonly IServiceProvider _provider;
-        private readonly ITradeCommandParser _tradeCommandParser;
+        //private readonly IKafkaProducer _kafkaProducer;
+        //private readonly IOptions<KafkaOptions> _options;
+        //private readonly IServiceProvider _provider;
+        //private readonly ITradeCommandParser _tradeCommandParser;
+        
 
         //private readonly ITradeCommandParser _tradeCommandParser;
 
-        public KafkaConsumerWorker(IKafkaConsumer kafkaConsumer,
-            ITradeCommandParser tradeCommandParser,
-            ILogger<KafkaConsumerWorker> logger,
-            IOptions<KafkaOptions> options,
-            IServiceProvider provider,
-            IKafkaProducer kafkaProducer)
+        public KafkaConsumerWorker(ILogger<KafkaConsumerWorker> logger
+            //IKafkaConsumer kafkaConsumer,
+            //ITradeCommandParser tradeCommandParser,
+            //IOptions<KafkaOptions> options,
+            //IServiceProvider provider,
+            //IKafkaProducer kafkaProducer
+            )
         {
             //_kafkaConsumer = kafkaConsumer;
-            _options = options;
+            //_options = options;
+            //_provider = provider;
+            //_kafkaProducer = kafkaProducer;
+            //_tradeCommandParser = tradeCommandParser;
             _logger = logger;
-            _provider = provider;
-            _kafkaProducer = kafkaProducer;
-            _tradeCommandParser = tradeCommandParser;
         }
         private string ImageToBase64(string filePath)
         {
@@ -46,16 +48,19 @@ namespace Shared.AppTest
         {
             try
             {
+                _logger.LogInformation("info");
+                _logger.LogWarning("warning");
+                _logger.LogError("error");
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);
                 //var rs = await _tradeCommandParser.ParseAsync("eth spot 1947 5% stop");
-                string msg = "limit short Chillguy: 73960 SL: 75k (2% risk) :Short: LIMIT Chillguy | Entry: 73960 | SL: 75000 (≤ 1.41%) | Risk: 2.0% Status: ⏳ Valid limit order • Today at 8:16 PM :peepo_wg: Position Overview , Use the buttons below to set your balance and risk. Image 💰 Set My Balance... , 🎯 Override Risk (%)... , , Only you can see this • Dismiss message , 8:46 PM";
-                msg = msg.Replace("WG Bot replying to WG Bot","");
-                if (msg.Contains("Status"))
-                {
-                    msg = msg.Split("Status")[0];
-                }
-                var rs = await _tradeCommandParser.ParseAsync(msg);
+                //string msg = "limit short Chillguy: 73960 SL: 75k (2% risk) :Short: LIMIT Chillguy | Entry: 73960 | SL: 75000 (≤ 1.41%) | Risk: 2.0% Status: ⏳ Valid limit order • Today at 8:16 PM :peepo_wg: Position Overview , Use the buttons below to set your balance and risk. Image 💰 Set My Balance... , 🎯 Override Risk (%)... , , Only you can see this • Dismiss message , 8:46 PM";
+                //msg = msg.Replace("WG Bot replying to WG Bot","");
+                //if (msg.Contains("Status"))
+                //{
+                //    msg = msg.Split("Status")[0];
+                //}
+                //var rs = await _tradeCommandParser.ParseAsync(msg);
                 //await _kafkaProducer.ProduceAsync("test", "test", "test");
                 //await _kafkaConsumer.ConsumeAsync(_options.Value.Topic, HandleMessage, stoppingToken);
             }
