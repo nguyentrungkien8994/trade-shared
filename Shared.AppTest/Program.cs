@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Shared.AppTest;
+using Shared.Database.MongoDb;
 using Shared.Logger.Serilog;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -18,5 +18,6 @@ string mongoDbDatabase = builder.Configuration["MONGODB_DATABASE"];
 // Background worker
 builder.Services.AddHostedService<KafkaConsumerWorker>();
 builder.Services.AddSerilog(builder.Configuration);
+builder.Services.UseDatabaseMongoDb(mongoDbUri,mongoDbDatabase);
 var host = builder.Build();
 await host.RunAsync();

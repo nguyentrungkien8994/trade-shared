@@ -1,27 +1,28 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Core.Database;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Shared.Kafka;
-using Shared.OpenAI;
-using System.Reflection;
+using MongoDB.Bson;
+using Shared.AppTest.Entities;
 
 namespace Shared.AppTest
 {
     public sealed class KafkaConsumerWorker : BackgroundService
     {
+        private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer,ObjectId>> _serviceBase;
+        private readonly IServiceBase<Customer, ObjectId> _serviceBase1;
         private readonly ILogger<KafkaConsumerWorker> _logger;
         //private readonly IKafkaConsumer _kafkaConsumer;
         //private readonly IKafkaProducer _kafkaProducer;
         //private readonly IOptions<KafkaOptions> _options;
         //private readonly IServiceProvider _provider;
         //private readonly ITradeCommandParser _tradeCommandParser;
-        
+
 
         //private readonly ITradeCommandParser _tradeCommandParser;
 
-        public KafkaConsumerWorker(ILogger<KafkaConsumerWorker> logger
+        public KafkaConsumerWorker(ILogger<KafkaConsumerWorker> logger, 
+            IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
+            IServiceBase<Customer, ObjectId> serviceBase1
             //IKafkaConsumer kafkaConsumer,
             //ITradeCommandParser tradeCommandParser,
             //IOptions<KafkaOptions> options,
@@ -35,6 +36,8 @@ namespace Shared.AppTest
             //_kafkaProducer = kafkaProducer;
             //_tradeCommandParser = tradeCommandParser;
             _logger = logger;
+            _serviceBase = serviceBase;
+            _serviceBase1 = serviceBase1;
         }
         private string ImageToBase64(string filePath)
         {
@@ -48,9 +51,20 @@ namespace Shared.AppTest
         {
             try
             {
-                _logger.LogInformation("info");
-                _logger.LogWarning("warning");
-                _logger.LogError("error");
+                //_logger.LogInformation("info");
+                //_logger.LogWarning("warning");
+                //_logger.LogError("error");
+                int effects = await _serviceBase1.InsertAsync(new Customer()
+                {
+                    code = "CODE001",
+                    name = "Nguyen Van B",
+                    created_at = DateTime.UtcNow.Ticks,
+                    updated_at = DateTime.UtcNow.Ticks,
+                    created_by = "admin",
+                    updated_by = "admin"
+                });
+                //var a = await _serviceBase.GetAllAsync();
+
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);
                 //var rs = await _tradeCommandParser.ParseAsync("eth spot 1947 5% stop");
@@ -70,7 +84,7 @@ namespace Shared.AppTest
             }
         }
 
-        
+
         private async Task HandleMessage(string? key, string value)
         {
             // TODO: xử lý nghiệp vụ tại đây
