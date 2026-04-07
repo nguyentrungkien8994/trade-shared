@@ -3,7 +3,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Shared.Database.MongoDb.Service;
-using Core.Database;
 using Shared.Database.MongoDb.Repository;
 namespace Shared.Database.MongoDb
 {

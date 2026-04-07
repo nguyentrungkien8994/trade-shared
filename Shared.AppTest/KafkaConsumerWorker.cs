@@ -2,15 +2,21 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using Newtonsoft.Json;
 using Shared.AppTest.Entities;
+using Shared.Database.Neo4j;
+using Shared.Database.Neo4j.Requests;
+using Shared.Database.Neo4j.Service;
+using Shared.Telegram;
 
 namespace Shared.AppTest
 {
     public sealed class KafkaConsumerWorker : BackgroundService
     {
-        private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer,ObjectId>> _serviceBase;
-        private readonly IServiceBase<Customer, ObjectId> _serviceBase1;
+        private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
+        private readonly IServiceBaseNeo4j<CustomerNeo4j, string> _serviceBaseNeo4j;
         private readonly ILogger<KafkaConsumerWorker> _logger;
+        private readonly ITelegramTopicService _topicService;
         //private readonly IKafkaConsumer _kafkaConsumer;
         //private readonly IKafkaProducer _kafkaProducer;
         //private readonly IOptions<KafkaOptions> _options;
@@ -20,9 +26,10 @@ namespace Shared.AppTest
 
         //private readonly ITradeCommandParser _tradeCommandParser;
 
-        public KafkaConsumerWorker(ILogger<KafkaConsumerWorker> logger, 
+        public KafkaConsumerWorker(ILogger<KafkaConsumerWorker> logger,
+            ITelegramTopicService topicService,
             IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
-            IServiceBase<Customer, ObjectId> serviceBase1
+            IServiceBaseNeo4j<CustomerNeo4j, string> serviceBaseNeo4j
             //IKafkaConsumer kafkaConsumer,
             //ITradeCommandParser tradeCommandParser,
             //IOptions<KafkaOptions> options,
@@ -35,9 +42,10 @@ namespace Shared.AppTest
             //_provider = provider;
             //_kafkaProducer = kafkaProducer;
             //_tradeCommandParser = tradeCommandParser;
+            _topicService = topicService;
             _logger = logger;
             _serviceBase = serviceBase;
-            _serviceBase1 = serviceBase1;
+            _serviceBaseNeo4j = serviceBaseNeo4j;
         }
         private string ImageToBase64(string filePath)
         {
@@ -54,16 +62,38 @@ namespace Shared.AppTest
                 //_logger.LogInformation("info");
                 //_logger.LogWarning("warning");
                 //_logger.LogError("error");
-                int effects = await _serviceBase1.InsertAsync(new Customer()
-                {
-                    code = "CODE001",
-                    name = "Nguyen Van B",
-                    created_at = DateTime.UtcNow.Ticks,
-                    updated_at = DateTime.UtcNow.Ticks,
-                    created_by = "admin",
-                    updated_by = "admin"
-                });
+                //int effects = await _serviceBase1.InsertAsync(new Customer()
+                //{
+                //    code = "CODE001",
+                //    name = "Nguyen Van C",
+                //    created_at = DateTime.UtcNow.Ticks,
+                //    updated_at = DateTime.UtcNow.Ticks,
+                //    created_by = "admin",
+                //    updated_by = "admin"
+                //});
                 //var a = await _serviceBase.GetAllAsync();
+
+               await  _topicService.SendMessageAsync(243, "<b>Test</b> html");
+                //await _serviceBaseNeo4j.InsertAsync(new CustomerNeo4j()
+                //{
+                //    id = Guid.NewGuid().ToString(),
+                //    code = "CODE001",
+                //    name = "Nguyen Van A",
+                //    created_at = DateTime.UtcNow.Ticks,
+                //    updated_at = DateTime.UtcNow.Ticks,
+                //    created_by = "admin",
+                //    updated_by = "admin"
+                //});
+                //await _serviceBaseNeo4j.GetAllAsync();
+
+                //await _serviceBaseNeo4j.DeleteAsync("acc43449-8b28-4609-9f7e-04be2cb2bbc8");
+                //string json = "{\"node\":\"Company\",\"filter\":{\"id\":{\"$gt\":2},\"Status\":\"ACTIVE\",\"$or\":[{\"Balance\":{\"$gte\":1000}},{\"Vip\":true}]}}";
+                //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gte\":3}},{\"code\":\"Vinpearl\"}]}}";
+                //SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
+                //Utils utils = new();
+                //var b = utils.Parse(json);
+                //string query = "MATCH(n:Company)-[r]-(c) RETURN n,r,c";
+                //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = query, Params = null });
 
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);

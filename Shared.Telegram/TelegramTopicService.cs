@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Text;
+using System.Net;
 
 namespace Shared.Telegram
 {
@@ -52,7 +53,7 @@ namespace Shared.Telegram
             CancellationToken ct = default)
         {
             var url = $"{BaseUrl}/sendMessage";
-
+            //var htmlcontent = WebUtility.HtmlEncode(message);
             var payload = new
             {
                 chat_id = _config.ChatId,

@@ -1,10 +1,9 @@
-﻿using Core.Database.Entity;
-using MongoDB.Bson;
-using Shared.Database.MongoDb.Entity;
+﻿
+using Shared.Database.Neo4j.Entity;
 
 namespace Shared.AppTest.Entities
 {
-    public class Customer : EntityBase
+    public class CustomerNeo4j: EntityBase<string>
     {
         public string code { get; set; }
         public string name { get; set; }

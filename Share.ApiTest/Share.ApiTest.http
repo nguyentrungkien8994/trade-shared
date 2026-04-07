@@ -1,0 +1,6 @@
+@Share.ApiTest_HostAddress = http://localhost:5280
+
+GET {{Share.ApiTest_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

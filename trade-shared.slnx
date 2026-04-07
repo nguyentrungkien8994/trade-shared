@@ -3,8 +3,10 @@
     <File Path="Directory.Packages.props" />
   </Folder>
   <Project Path="Core.Database/Core.Database.csproj" Id="43d3af71-b4c5-42b6-b086-9e3f8d208c28" />
+  <Project Path="Share.ApiTest/Share.ApiTest.csproj" Id="967ee2a4-fc17-43e2-b0c6-bab5a7cf33b7" />
   <Project Path="Shared.AppTest/Shared.AppTest.csproj" Id="3b5d293a-3eca-4c08-9e8e-ce7c4de821f4" />
   <Project Path="Shared.Database.MongoDb/Shared.Database.MongoDb.csproj" Id="c81e4ae9-f819-420e-aca2-fd831b8b5fae" />
+  <Project Path="Shared.Database.Neo4j/Shared.Database.Neo4j.csproj" Id="02377f3e-da0e-4932-bb0c-9591980ba141" />
   <Project Path="Shared.Helper/Shared.Helper.csproj" Id="753dc159-5859-47c8-a3f4-18fc45ff67ff" />
   <Project Path="Shared.Kafka/Shared.Kafka.csproj" Id="4665ae76-59b9-4e25-8f95-56360b5dcdcb" />
   <Project Path="Shared.Logger.Serilog/Shared.Logger.Serilog.csproj" Id="9c72f5de-d6d3-4a45-b638-8a631656a7be" />
