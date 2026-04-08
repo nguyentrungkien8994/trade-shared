@@ -17,7 +17,11 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.UseDatabaseNeo4j(neo4jDbUri, neo4jUsername, neo4jPassword);
 builder.Services.AddControllers();
-
+builder.Services.AddRedis(option =>
+{
+    option.ConnectionString = "localhost:6379";
+    option.InstanceName = "tradeapp:";
+});
 var app = builder.Build();
 app.UseCors("AllowAll");
 // Configure the HTTP request pipeline.

@@ -7,7 +7,12 @@ using Shared.AppTest.Entities;
 using Shared.Database.Neo4j;
 using Shared.Database.Neo4j.Requests;
 using Shared.Database.Neo4j.Service;
+using Shared.OpenAI;
+using Shared.Redis;
 using Shared.Telegram;
+using StackExchange.Redis;
+using System.Text;
+using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace Shared.AppTest
 {
@@ -21,7 +26,8 @@ namespace Shared.AppTest
         //private readonly IKafkaProducer _kafkaProducer;
         //private readonly IOptions<KafkaOptions> _options;
         //private readonly IServiceProvider _provider;
-        //private readonly ITradeCommandParser _tradeCommandParser;
+        private readonly ITradeCommandParser _tradeCommandParser;
+        private readonly IRedisStreamService _redisStreamService;
 
 
         //private readonly ITradeCommandParser _tradeCommandParser;
@@ -29,9 +35,10 @@ namespace Shared.AppTest
         public KafkaConsumerWorker(ILogger<KafkaConsumerWorker> logger,
             ITelegramTopicService topicService,
             IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
-            IServiceBaseNeo4j<CustomerNeo4j, string> serviceBaseNeo4j
+            IServiceBaseNeo4j<CustomerNeo4j, string> serviceBaseNeo4j,
             //IKafkaConsumer kafkaConsumer,
-            //ITradeCommandParser tradeCommandParser,
+            ITradeCommandParser tradeCommandParser,
+            IRedisStreamService redisStreamService
             //IOptions<KafkaOptions> options,
             //IServiceProvider provider,
             //IKafkaProducer kafkaProducer
@@ -41,11 +48,13 @@ namespace Shared.AppTest
             //_options = options;
             //_provider = provider;
             //_kafkaProducer = kafkaProducer;
-            //_tradeCommandParser = tradeCommandParser;
+            _tradeCommandParser = tradeCommandParser;
             _topicService = topicService;
             _logger = logger;
             _serviceBase = serviceBase;
             _serviceBaseNeo4j = serviceBaseNeo4j;
+            _redisStreamService = redisStreamService;
+
         }
         private string ImageToBase64(string filePath)
         {
@@ -62,6 +71,8 @@ namespace Shared.AppTest
                 //_logger.LogInformation("info");
                 //_logger.LogWarning("warning");
                 //_logger.LogError("error");
+
+                //mongodb
                 //int effects = await _serviceBase1.InsertAsync(new Customer()
                 //{
                 //    code = "CODE001",
@@ -73,7 +84,15 @@ namespace Shared.AppTest
                 //});
                 //var a = await _serviceBase.GetAllAsync();
 
-               await  _topicService.SendMessageAsync(243, "<b>Test</b> html");
+                //Telegram
+                // StringBuilder sb = new();
+                // sb.AppendLine("🟢 LONG BTC");
+                // sb.AppendLine("📈 Entry: 65,000");
+                // sb.AppendLine("🚀 Target: 70,000");
+                //await  _topicService.SendMessageAsync(243, sb.ToString());
+
+
+                //neo4j
                 //await _serviceBaseNeo4j.InsertAsync(new CustomerNeo4j()
                 //{
                 //    id = Guid.NewGuid().ToString(),
@@ -85,16 +104,22 @@ namespace Shared.AppTest
                 //    updated_by = "admin"
                 //});
                 //await _serviceBaseNeo4j.GetAllAsync();
-
                 //await _serviceBaseNeo4j.DeleteAsync("acc43449-8b28-4609-9f7e-04be2cb2bbc8");
                 //string json = "{\"node\":\"Company\",\"filter\":{\"id\":{\"$gt\":2},\"Status\":\"ACTIVE\",\"$or\":[{\"Balance\":{\"$gte\":1000}},{\"Vip\":true}]}}";
-                //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gte\":3}},{\"code\":\"Vinpearl\"}]}}";
-                //SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
+                //string json = "{\"node\":\"TaxPayer\",\"filter\":{\"taxCode\":{\"$eq\":\"A\"}},\"relations\":[{\"type\":\"HAS_BUCKET\",\"direction\":\"out\",\"target\":\"InvoiceBucket\",\"depth\":{\"min\":1,\"max\":3}},{\"type\":\"TO\",\"direction\":\"in\",\"target\":\"Invoice\"}]}";
+                //string json = "{\"node\":\"TaxPayer\",\"filter\":{\"taxCode\":{\"$eq\":\"A\"}}}";
+                //string json = "{\"node\":\"TaxPayer\",\"target\":{\"node\":\"InvoiceBucket\"}}";
+                //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
+                //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
+                //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]}}";
+                //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //Utils utils = new();
                 //var b = utils.Parse(json);
-                //string query = "MATCH(n:Company)-[r]-(c) RETURN n,r,c";
-                //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = query, Params = null });
+                //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
 
+                //OpenAI
+                //var rs = await _tradeCommandParser.ParseAsync("@Kante Near spot 1.5% risk :Spot: NEAR | Entry: 1.324 | SL: 1.1105 (≤ 16.13%) | Risk: 1.5%");
+                //trade parser
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);
                 //var rs = await _tradeCommandParser.ParseAsync("eth spot 1947 5% stop");
@@ -105,8 +130,35 @@ namespace Shared.AppTest
                 //    msg = msg.Split("Status")[0];
                 //}
                 //var rs = await _tradeCommandParser.ParseAsync(msg);
+
+                //Kafka
                 //await _kafkaProducer.ProduceAsync("test", "test", "test");
                 //await _kafkaConsumer.ConsumeAsync(_options.Value.Topic, HandleMessage, stoppingToken);
+
+                //Redis
+                const string stream = "trade.test";
+                const string group = "order-group";
+                var consumer = Environment.MachineName;
+                //await _redisStreamService.AddAsync<object>(stream, "test message");
+
+                await _redisStreamService.CreateConsumerGroupAsync(stream, group);
+                while (true)
+                {
+                    var messages = await _redisStreamService.ReadGroupAsync<object>(
+                    stream,
+                    group,
+                    consumer,
+                    count: 10);
+                    if (messages.Count > 0)
+                    {
+                        foreach ( var message in messages)
+                        {
+                            Console.WriteLine(message.Data.ToString());
+                        }
+                    }   
+                    else Console.WriteLine("Nothing");
+                    Thread.Sleep(3000);
+                }
             }
             catch (Exception ex)
             {

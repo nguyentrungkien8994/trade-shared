@@ -5,6 +5,8 @@
         public string Node { get; set; }
         public object Filter { get; set; }
         public List<RelationDsl> Relations { get; set; }
+        public Target Target { get; set; }
+        
     }
     public class RelationDsl
     {
@@ -19,5 +21,16 @@
     {
         public int Min { get; set; }
         public int Max { get; set; }
+    }
+    public class GraphQueryOptions
+    {
+        public int DefaultMinDepth { get; set; } = 1;
+        public int DefaultMaxDepth { get; set; } = 10;
+        public int HardMaxDepth { get; set; } = 100; // chống abuse
+    }
+    public class Target
+    {
+        public string Node {  set; get; }
+        public object Filter { get; set; }
     }
 }

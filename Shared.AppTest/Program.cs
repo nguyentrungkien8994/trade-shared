@@ -21,7 +21,7 @@ long.TryParse(strTeleChatId, out long teleChatId);
 
 // Kafka options
 //builder.Services.AddConfluentKafka(kafka_bootstrap, kafka_group, kafka_topic);
-//builder.Services.AddOpenAI();
+builder.Services.AddOpenAI();
 // Background worker
 builder.Services.AddHostedService<KafkaConsumerWorker>();
 builder.Services.AddSerilog(builder.Configuration);
@@ -31,6 +31,11 @@ builder.Services.AddSingleton(new TelegramConfig
 {
     BotToken = telegramToken, // "8247270418:AAGyelnBHXnYX1TGl80O7B-3Ta7PqB7wS2Q",
     ChatId = teleChatId// -1003629499475
+});
+builder.Services.AddRedis(option =>
+{
+    option.ConnectionString = "localhost:6379";
+    option.InstanceName = "tradeapp:";
 });
 builder.Services.AddSingleton<ITelegramTopicService, TelegramTopicService>();
 var host = builder.Build();
