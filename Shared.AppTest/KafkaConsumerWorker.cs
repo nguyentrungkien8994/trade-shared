@@ -118,7 +118,7 @@ namespace Shared.AppTest
                 //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
 
                 //OpenAI
-                //var rs = await _tradeCommandParser.ParseAsync("@Kante Near spot 1.5% risk :Spot: NEAR | Entry: 1.324 | SL: 1.1105 (≤ 16.13%) | Risk: 1.5%");
+                var rs = await _tradeCommandParser.ParseAsync("LONG  LIMIT TAO  Entry: 301  SL: 291.5 (≤ 3.16%)  Risk: 2.0% ");
                 //trade parser
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);
@@ -136,29 +136,29 @@ namespace Shared.AppTest
                 //await _kafkaConsumer.ConsumeAsync(_options.Value.Topic, HandleMessage, stoppingToken);
 
                 //Redis
-                const string stream = "trade.test";
-                const string group = "order-group";
-                var consumer = Environment.MachineName;
-                //await _redisStreamService.AddAsync<object>(stream, "test message");
+                //const string stream = "trade.test";
+                //const string group = "order-group";
+                //var consumer = Environment.MachineName;
+                ////await _redisStreamService.AddAsync<object>(stream, "test message");
 
-                await _redisStreamService.CreateConsumerGroupAsync(stream, group);
-                while (true)
-                {
-                    var messages = await _redisStreamService.ReadGroupAsync<object>(
-                    stream,
-                    group,
-                    consumer,
-                    count: 10);
-                    if (messages.Count > 0)
-                    {
-                        foreach ( var message in messages)
-                        {
-                            Console.WriteLine(message.Data.ToString());
-                        }
-                    }   
-                    else Console.WriteLine("Nothing");
-                    Thread.Sleep(3000);
-                }
+                //await _redisStreamService.CreateConsumerGroupAsync(stream, group);
+                //while (true)
+                //{
+                //    var messages = await _redisStreamService.ReadGroupAsync<object>(
+                //    stream,
+                //    group,
+                //    consumer,
+                //    count: 10);
+                //    if (messages.Count > 0)
+                //    {
+                //        foreach ( var message in messages)
+                //        {
+                //            Console.WriteLine(message.Data.ToString());
+                //        }
+                //    }   
+                //    else Console.WriteLine("Nothing");
+                //    Thread.Sleep(3000);
+                //}
             }
             catch (Exception ex)
             {

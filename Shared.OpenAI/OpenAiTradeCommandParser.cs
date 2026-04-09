@@ -83,6 +83,11 @@ public sealed class OpenAiTradeCommandParser : ITradeCommandParser
         - takeProfit is extracted ONLY if explicitly mentioned.
         --------------------------------------------------
 
+        4. NORMALIZE INPUT:
+        - Collapse multiple spaces into a single space
+        - Ignore extra spacing, tabs, or line breaks
+        - Case-insensitive
+
         SIDE DETERMINATION RULES (CRITICAL):
        
         1. If message explicitly contains:

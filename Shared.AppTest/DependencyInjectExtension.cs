@@ -35,7 +35,6 @@ namespace Shared.AppTest
             services.AddSingleton<IOptions<OpenAiParserOptions>>(
                 Options.Create(new OpenAiParserOptions
                 {
-                    ApiKey="",
                     MaxTokens = 328
                 })
             );
