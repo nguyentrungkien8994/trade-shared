@@ -27,6 +27,7 @@ builder.Services.AddHostedService<KafkaConsumerWorker>();
 builder.Services.AddSerilog(builder.Configuration);
 builder.Services.UseDatabaseMongoDb(mongoDbUri, mongoDbDatabase);
 builder.Services.UseDatabaseNeo4j(neo4jDbUri, neo4jUsername, neo4jPassword);
+builder.Services.AddOracle("Data Source=(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP) (HOST=172.20.91.100)(PORT=1521))) (CONNECT_DATA=(SERVER=DEDICATED)(SERVICE_NAME=SHAREDATA))); User Id=SHARE_GRAPH;Password=V1sualiz@t!0n;");
 builder.Services.AddSingleton(new TelegramConfig
 {
     BotToken = telegramToken, // "8247270418:AAGyelnBHXnYX1TGl80O7B-3Ta7PqB7wS2Q",

@@ -2,22 +2,18 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using Newtonsoft.Json;
 using Shared.AppTest.Entities;
-using Shared.Database.Neo4j;
-using Shared.Database.Neo4j.Requests;
+using Shared.AppTest.Entities.Oracle;
 using Shared.Database.Neo4j.Service;
 using Shared.OpenAI;
 using Shared.Redis;
 using Shared.Telegram;
-using StackExchange.Redis;
-using System.Text;
-using static Confluent.Kafka.ConfigPropertyNames;
 
 namespace Shared.AppTest
 {
     public sealed class KafkaConsumerWorker : BackgroundService
     {
+        //private readonly Shared.Database.Oracle.Service.ServiceBase<Person,int> _oracleService;
         private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
         private readonly IServiceBaseNeo4j<CustomerNeo4j, string> _serviceBaseNeo4j;
         private readonly ILogger<KafkaConsumerWorker> _logger;
@@ -36,8 +32,9 @@ namespace Shared.AppTest
             ITelegramTopicService topicService,
             IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
             IServiceBaseNeo4j<CustomerNeo4j, string> serviceBaseNeo4j,
-            //IKafkaConsumer kafkaConsumer,
-            ITradeCommandParser tradeCommandParser,
+            //Shared.Database.Oracle.Service.ServiceBase<Person, int> oracleService,
+        //IKafkaConsumer kafkaConsumer,
+        ITradeCommandParser tradeCommandParser,
             IRedisStreamService redisStreamService
             //IOptions<KafkaOptions> options,
             //IServiceProvider provider,
@@ -53,6 +50,7 @@ namespace Shared.AppTest
             _logger = logger;
             _serviceBase = serviceBase;
             _serviceBaseNeo4j = serviceBaseNeo4j;
+            //_oracleService = oracleService;
             _redisStreamService = redisStreamService;
 
         }
@@ -117,8 +115,13 @@ namespace Shared.AppTest
                 //var b = utils.Parse(json);
                 //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
 
+                //Oracle
+                
+                //var arr = await _oracleService.GetAllAsync();
+                //var b = 1;
+
                 //OpenAI
-                var rs = await _tradeCommandParser.ParseAsync("LONG  LIMIT TAO  Entry: 301  SL: 291.5 (≤ 3.16%)  Risk: 2.0% ");
+                var rs = await _tradeCommandParser.ParseAsync("LONG LIMIT TAO Entry: 312.8 SL: 304.6 (≤ 2.62%) Risk: 2.0% ");
                 //trade parser
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);

@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 
 		<PackageId>Kai.Shared.OpenAI</PackageId>
-		<Version>1.0.5</Version>
+		<Version>1.0.6</Version>
 		<Authors>Kai</Authors>
 		<RepositoryUrl>https://github.com/nguyentrungkien8994/trade-shared</RepositoryUrl>
 	</PropertyGroup>

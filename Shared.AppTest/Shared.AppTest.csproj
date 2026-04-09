@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Shared.Database.MongoDb\Shared.Database.MongoDb.csproj" />
     <ProjectReference Include="..\Shared.Database.Neo4j\Shared.Database.Neo4j.csproj" />
+    <ProjectReference Include="..\Shared.Database.Oracle\Shared.Database.Oracle.csproj" />
     <ProjectReference Include="..\Shared.Kafka\Shared.Kafka.csproj" />
     <ProjectReference Include="..\Shared.Logger.Serilog\Shared.Logger.Serilog.csproj" />
     <ProjectReference Include="..\Shared.OpenAI\Shared.OpenAI.csproj" />
