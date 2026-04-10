@@ -1,10 +1,5 @@
 ﻿using Core.Database.Entity;
 using Shared.Database.Oracle.Attributes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shared.AppTest.Entities.Oracle
 {
@@ -20,5 +15,8 @@ namespace Shared.AppTest.Entities.Oracle
         public long created_at { get; set; }
 
         public long updated_at { get; set; }
+        public string FULLNAME { get; set; }
+        public string ROLENAME { get; set; }
+        public int SYNC_STATUS { get; set; }
     }
 }

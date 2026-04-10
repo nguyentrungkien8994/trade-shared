@@ -20,12 +20,12 @@ namespace Shared.Database.MongoDb
                 new OracleConnectionFactory(connectionString));
 
             // ================= REPOSITORY =================
-            services.AddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+            services.AddScoped(typeof(IRepositoryBaseOracle<,>), typeof(RepositoryBase<,>));
 
             // ================= SERVICE BASE =================
-            services.AddScoped(typeof(IServiceBase<,,>), typeof(ServiceBase<,,>));
-            services.AddScoped(typeof(IServiceBase<,>), typeof(ServiceBase<,>));
-            services.AddScoped(typeof(IServiceBase<>), typeof(ServiceBase<>));
+            services.AddScoped(typeof(IServiceBaseOracle<,,>), typeof(ServiceBase<,,>));
+            services.AddScoped(typeof(IServiceBaseOracle<,>), typeof(ServiceBase<,>));
+            services.AddScoped(typeof(IServiceBaseOracle<>), typeof(ServiceBase<>));
 
             return services;
         }

@@ -5,6 +5,7 @@ using MongoDB.Bson;
 using Shared.AppTest.Entities;
 using Shared.AppTest.Entities.Oracle;
 using Shared.Database.Neo4j.Service;
+using Shared.Database.Oracle.Service;
 using Shared.OpenAI;
 using Shared.Redis;
 using Shared.Telegram;
@@ -13,7 +14,7 @@ namespace Shared.AppTest
 {
     public sealed class KafkaConsumerWorker : BackgroundService
     {
-        //private readonly Shared.Database.Oracle.Service.ServiceBase<Person,int> _oracleService;
+        private readonly IServiceBaseOracle<Person, int> _oracleService;
         private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
         private readonly IServiceBaseNeo4j<CustomerNeo4j, string> _serviceBaseNeo4j;
         private readonly ILogger<KafkaConsumerWorker> _logger;
@@ -32,7 +33,7 @@ namespace Shared.AppTest
             ITelegramTopicService topicService,
             IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
             IServiceBaseNeo4j<CustomerNeo4j, string> serviceBaseNeo4j,
-            //Shared.Database.Oracle.Service.ServiceBase<Person, int> oracleService,
+            IServiceBaseOracle<Person, int> oracleService,
         //IKafkaConsumer kafkaConsumer,
         ITradeCommandParser tradeCommandParser,
             IRedisStreamService redisStreamService
@@ -50,7 +51,7 @@ namespace Shared.AppTest
             _logger = logger;
             _serviceBase = serviceBase;
             _serviceBaseNeo4j = serviceBaseNeo4j;
-            //_oracleService = oracleService;
+            _oracleService = oracleService;
             _redisStreamService = redisStreamService;
 
         }
@@ -116,12 +117,53 @@ namespace Shared.AppTest
                 //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
 
                 //Oracle
-                
-                //var arr = await _oracleService.GetAllAsync();
-                //var b = 1;
+                var filters = new Dictionary<string, object>
+                {
+                    { "$and", new object[]
+                        {
+                            new Dictionary<string, object>
+                            {
+                                { "SYNC_STATUS", new Dictionary<string, object> { { "$eq", 0 } } }
+                            },
+                            new Dictionary<string, object>
+                            {
+                                { "$or", new object[]
+                                    {
+                                        new Dictionary<string, object>
+                                        {
+                                            { "id", new Dictionary<string, object> { { "$gt", 4891160 } } }
+                                        },
+                                        new Dictionary<string, object>
+                                        {
+                                            { "id", new Dictionary<string, object> { { "$eq", 1 } } }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+
+                //var filters = new Dictionary<string, object>
+                //            {
+                //                {"$or", new object[]{
+                //                        new Dictionary<string, object>
+                //                        {
+                //                            { "id", new Dictionary<string, object> { { "$gt", 4891160 } } }
+                //                        },
+                //                        new Dictionary<string, object>
+                //                        {
+                //                            { "id", new Dictionary<string, object> { { "$eq", 1 } } }
+                //                        }
+
+                //                } }
+                //            };
+
+                var arr = await _oracleService.GetPaging(0, 10, filters);
+                var b = 1;
 
                 //OpenAI
-                var rs = await _tradeCommandParser.ParseAsync("LONG LIMIT TAO Entry: 312.8 SL: 304.6 (≤ 2.62%) Risk: 2.0% ");
+                //var rs = await _tradeCommandParser.ParseAsync("LONG LIMIT TAO Entry: 312.8 SL: 304.6 (≤ 2.62%) Risk: 2.0% ");
                 //trade parser
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);

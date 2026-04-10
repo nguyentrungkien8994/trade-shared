@@ -1,5 +1,6 @@
 ﻿using Core.Database;
 using Dapper;
+using System.Reflection;
 using System.Text;
 namespace Shared.Database.Oracle.Builder;
 
@@ -70,18 +71,113 @@ WHERE {idField.ToUpper()} = :{idField}";
     }
 
     // ================= WHERE =================
-    public (string sql, object param) BuildWhere<T>(IDictionary<string, object> filters)
+    private string BuildFieldCondition(
+    string field,
+    object value,
+    List<PropertyInfo> props,
+    Dictionary<string, object> parameters,
+    SqlParamContext ctx)
     {
-        var table = EntityMetadata.GetTableName(typeof(T));
+        var prop = props.FirstOrDefault(p =>
+            p.Name.Equals(field, StringComparison.OrdinalIgnoreCase));
 
-        var conditions = filters.Keys
-            .Select(k => $"{k.ToUpper()} = :{k}");
+        if (prop == null)
+            throw new Exception($"Invalid field: {field}");
 
-        var sql = $@"
-SELECT * FROM {table}
-WHERE {string.Join(" AND ", conditions)}";
+        var column = EntityMetadata.GetColumnName(prop);
 
-        return (sql, filters);
+        if (value is IDictionary<string, object> ops)
+        {
+            var conditions = new List<string>();
+
+            foreach (var (op, val) in ops)
+            {
+                var paramName = ctx.Next($"p_{field}");
+
+                var condition = op switch
+                {
+                    "$eq" => $"{column} = :{paramName}",
+                    "$neq" => $"{column} <> :{paramName}",
+                    "$gt" => $"{column} > :{paramName}",
+                    "$gte" => $"{column} >= :{paramName}",
+                    "$lt" => $"{column} < :{paramName}",
+                    "$lte" => $"{column} <= :{paramName}",
+                    "$like" => $"{column} LIKE :{paramName}",
+                    "$in" => $"{column} IN :{paramName}",
+                    "$null" => $"{column} IS NULL",
+                    "$notnull" => $"{column} IS NOT NULL",
+                    "$between" => BuildBetween(column, val, parameters, ctx),
+                    _ => throw new NotSupportedException(op)
+                };
+
+                if (op != "$null" && op != "$notnull")
+                    parameters[paramName] = val;
+
+                conditions.Add(condition);
+            }
+
+            return string.Join(" AND ", conditions);
+        }
+
+        // shorthand
+        var name = ctx.Next($"p_{field}");
+        parameters[name] = value;
+
+        return $"{column} = :{name}";
+    }
+
+    private string BuildBetween(
+    string column,
+    object value,
+    Dictionary<string, object> parameters,
+    SqlParamContext ctx)
+    {
+        var arr = (object[])value;
+
+        var p1 = ctx.Next("bt");
+        var p2 = ctx.Next("bt");
+
+        parameters[p1] = arr[0];
+        parameters[p2] = arr[1];
+
+        return $"{column} BETWEEN :{p1} AND :{p2}";
+    }
+
+    public string BuildWhere<T>(object filter,
+    List<PropertyInfo> props,
+    Dictionary<string, object> parameters,
+    SqlParamContext ctx)
+    {
+        if (filter is IDictionary<string, object> dict)
+        {
+            var conditions = new List<string>();
+
+            foreach (var (key, value) in dict)
+            {
+                if (key == "$and" || key == "$or")
+                {
+                    var items = (object[])value;
+
+                    var sub = items.Select(item =>
+                        "(" + BuildWhere<T>(item, props, parameters, ctx) + ")"
+                    );
+
+                    var join = key == "$or" ? " OR " : " AND ";
+
+                    conditions.Add(string.Join(join, sub));
+                }
+                else
+                {
+                    conditions.Add(
+                        BuildFieldCondition(key, value, props, parameters, ctx)
+                    );
+                }
+            }
+
+            return string.Join(" AND ", conditions);
+        }
+
+        throw new Exception("Invalid filter");
     }
 
     // ================= PAGING =================
@@ -165,4 +261,51 @@ WHEN NOT MATCHED THEN
 
         return (sb.ToString(), param);
     }
+
+    public (string sql, object param) BuildPaging<T>(int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    {
+        var type = typeof(T);
+        var table = EntityMetadata.GetTableName(type);
+        var props = EntityMetadata.GetProperties(type);
+
+        var parameters = new Dictionary<string, object>
+        {
+            ["skip"] = skip,
+            ["take"] = take
+        };
+        var ctx = new SqlParamContext();
+        var sql = new StringBuilder();
+        sql.Append($"SELECT * FROM {table}");
+
+        // ================= WHERE =================
+        if (filters != null && filters.Count > 0)
+        {
+            var where = BuildWhere<T>(filters, props, parameters,ctx);
+            sql.Append(" WHERE " + where);
+        }
+
+        // ================= ORDER =================
+        if (sort != null && sort.Any())
+        {
+            var order = sort.Select(s =>
+            {
+                var prop = props.First(p => p.Name.Equals(s.field, StringComparison.OrdinalIgnoreCase));
+                var col = EntityMetadata.GetColumnName(prop);
+                return $"{col} {(s.desc ? "DESC" : "ASC")}";
+            });
+
+            sql.Append(" ORDER BY " + string.Join(",", order));
+        }
+        else
+        {
+            sql.Append(" ORDER BY 1");
+        }
+
+        // ================= PAGING =================
+        sql.Append(" OFFSET :skip ROWS FETCH NEXT :take ROWS ONLY");
+
+        return (sql.ToString(), parameters);
+    }
+
+  
 }

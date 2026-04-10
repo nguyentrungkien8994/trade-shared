@@ -1,10 +1,12 @@
 ﻿using Core.Database;
+using Core.Database.Dto;
 using Core.Database.Entity;
+using Shared.Database.Oracle.Repository;
 using System.Linq.Expressions;
 
 namespace Shared.Database.Oracle.Service;
 
-public class ServiceBase<T, TId, IRepo> : IServiceBase<T, TId, IRepo> where T : IEntityBase<TId> where IRepo : IRepositoryBase<T, TId>
+public class ServiceBase<T, TId, IRepo> : IServiceBaseOracle<T, TId, IRepo> where T : IEntityBase<TId> where IRepo : IRepositoryBaseOracle<T, TId>
 {
     private readonly IRepo _repositoryBase;
 
@@ -41,6 +43,11 @@ public class ServiceBase<T, TId, IRepo> : IServiceBase<T, TId, IRepo> where T : 
         return _repositoryBase.GetAsync(id);
     }
 
+    public Task<PagingObject<T>> GetPaging(int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    {
+        return _repositoryBase.GetPaging(skip,take,filters,sort);
+    }
+
     public Task<int> InsertAsync(T entity)
     {
         return (_repositoryBase.InsertAsync(entity));
@@ -49,6 +56,11 @@ public class ServiceBase<T, TId, IRepo> : IServiceBase<T, TId, IRepo> where T : 
     public Task<int> InsertRangeAsync(T[] entities)
     {
         return _repositoryBase.InsertRangeAsync(entities);
+    }
+
+    public Task<IEnumerable<T>> Search(IDictionary<string, object>? filters = null)
+    {
+        return _repositoryBase.Search(filters);
     }
 
     public Task<List<T>> SearchAsync(Expression<Func<T, bool>> expression)
@@ -91,15 +103,15 @@ public class ServiceBase<T, TId, IRepo> : IServiceBase<T, TId, IRepo> where T : 
         return _repositoryBase.UpdateRangeAsync(entities);
     }
 }
-public class ServiceBase<T, TId> : ServiceBase<T, TId, IRepositoryBase<T, TId>>, IServiceBase<T, TId> where T : IEntityBase<TId>
+public class ServiceBase<T, TId> : ServiceBase<T, TId, IRepositoryBaseOracle<T, TId>>, IServiceBaseOracle<T, TId> where T : IEntityBase<TId>
 {
-    public ServiceBase(IRepositoryBase<T, TId> repositoryBase) : base(repositoryBase)
+    public ServiceBase(IRepositoryBaseOracle<T, TId> repositoryBase) : base(repositoryBase)
     {
     }
 }
-public class ServiceBase<T> : ServiceBase<T, Guid, IRepositoryBase<T, Guid>>, IServiceBase<T, Guid> where T : IEntityBase<Guid>
+public class ServiceBase<T> : ServiceBase<T, Guid, IRepositoryBaseOracle<T, Guid>>, IServiceBaseOracle<T, Guid> where T : IEntityBase<Guid>
 {
-    public ServiceBase(IRepositoryBase<T, Guid> repositoryBase) : base(repositoryBase)
+    public ServiceBase(IRepositoryBaseOracle<T, Guid> repositoryBase) : base(repositoryBase)
     {
     }
 }
