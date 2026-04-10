@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Kai.Shared.Database.Oracle</PackageId>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 		<Authors>Kai</Authors>
 		<RepositoryUrl></RepositoryUrl>
 	</PropertyGroup>
@@ -16,10 +16,10 @@
 		<PackageReference Include="Oracle.ManagedDataAccess.Core" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Core.Database\KLib.Core.Database.csproj" />
+	  <Folder Include="Entity\" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Entity\" />
+	  <ProjectReference Include="..\Core.Database\KLib.Core.Database.csproj" />
 	</ItemGroup>
 
 </Project>
