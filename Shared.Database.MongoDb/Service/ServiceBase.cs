@@ -1,5 +1,5 @@
-﻿using Core.Database;
-using Core.Database.Entity;
+﻿using KLib.Core.Database;
+using KLib.Core.Database.Entity;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 

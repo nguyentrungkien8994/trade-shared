@@ -1,4 +1,4 @@
-﻿using Core.Database.Entity;
+﻿using KLib.Core.Database.Entity;
 using Newtonsoft.Json;
 namespace Shared.Database.Neo4j.Entity;
 

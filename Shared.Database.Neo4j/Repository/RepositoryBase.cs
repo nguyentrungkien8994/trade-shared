@@ -1,4 +1,4 @@
-﻿using Core.Database.Entity;
+﻿using KLib.Core.Database.Entity;
 using Shared.Database.Neo4j.DataAccess;
 using Shared.Database.Neo4j.Requests;
 using Shared.Database.Neo4j.Responses;

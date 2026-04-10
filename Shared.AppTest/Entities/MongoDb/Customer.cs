@@ -1,4 +1,4 @@
-﻿using Core.Database.Entity;
+﻿using KLib.Core.Database.Entity;
 using MongoDB.Bson;
 using Shared.Database.MongoDb.Entity;
 

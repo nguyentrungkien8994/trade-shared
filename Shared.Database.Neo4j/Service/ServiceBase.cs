@@ -1,5 +1,5 @@
-﻿using Core.Database;
-using Core.Database.Entity;
+﻿using KLib.Core.Database;
+using KLib.Core.Database.Entity;
 using Neo4j.Driver;
 using Shared.Database.Neo4j.Repository;
 using Shared.Database.Neo4j.Requests;

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
-namespace Core.Database;
+namespace KLib.Core.Database;
 
 public static class EntityExtension
 {

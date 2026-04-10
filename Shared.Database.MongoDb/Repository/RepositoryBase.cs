@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
 using System.Linq.Expressions;
-using Core.Database;
-using Core.Database.Entity;
+using KLib.Core.Database;
+using KLib.Core.Database.Entity;
 
 namespace Shared.Database.MongoDb.Repository;
 

@@ -1,6 +1,5 @@
-﻿using Core.Database;
-using Core.Database.Dto;
-using Core.Database.Entity;
+﻿using KLib.Core.Database.Dto;
+using KLib.Core.Database.Entity;
 using Shared.Database.Oracle.Repository;
 using System.Linq.Expressions;
 

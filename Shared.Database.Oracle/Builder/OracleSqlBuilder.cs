@@ -1,4 +1,4 @@
-﻿using Core.Database;
+﻿using KLib.Core.Database;
 using Dapper;
 using System.Reflection;
 using System.Text;

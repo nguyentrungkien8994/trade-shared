@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Kai.Shared.Database.Neo4j</PackageId>
-		<Version>1.0.1</Version>
+		<Version>1.0.2</Version>
 		<Authors>Kai</Authors>
 		<RepositoryUrl></RepositoryUrl>
 	</PropertyGroup>
@@ -15,7 +15,7 @@
 		<PackageReference Include="Neo4j.Driver" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Core.Database\Core.Database.csproj" />
+		<ProjectReference Include="..\Core.Database\KLib.Core.Database.csproj" />
 	</ItemGroup>
 
 </Project>

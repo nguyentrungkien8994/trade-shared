@@ -1,6 +1,6 @@
-﻿using Core.Database;
-using Core.Database.Dto;
-using Core.Database.Entity;
+﻿using KLib.Core.Database;
+using KLib.Core.Database.Dto;
+using KLib.Core.Database.Entity;
 using Dapper;
 using Shared.Database.Oracle.Builder;
 using Shared.Database.Oracle.Factory;

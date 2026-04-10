@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Database.Dto
+namespace KLib.Core.Database.Dto
 {
     public class PagingObject<T>
     {

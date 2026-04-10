@@ -1,7 +1,7 @@
-﻿using Core.Database.Entity;
+﻿using KLib.Core.Database.Entity;
 using System.Linq.Expressions;
 
-namespace Core.Database;
+namespace KLib.Core.Database;
 
 public interface IServiceBase<T,TId,IRepo> where T : IEntityBase<TId> where IRepo : IRepositoryBase<T,TId>
 {

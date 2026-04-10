@@ -1,4 +1,4 @@
-﻿using Core.Database.Entity;
+﻿using KLib.Core.Database.Entity;
 using Shared.Database.Oracle.Attributes;
 
 namespace Shared.AppTest.Entities.Oracle

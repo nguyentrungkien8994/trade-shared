@@ -1,4 +1,4 @@
-﻿using Core.Database;
+﻿using KLib.Core.Database;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;

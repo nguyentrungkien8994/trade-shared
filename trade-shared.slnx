@@ -2,7 +2,7 @@
   <Folder Name="/cmp/">
     <File Path="Directory.Packages.props" />
   </Folder>
-  <Project Path="Core.Database/Core.Database.csproj" Id="43d3af71-b4c5-42b6-b086-9e3f8d208c28" />
+  <Project Path="Core.Database/KLib.Core.Database.csproj" Id="43d3af71-b4c5-42b6-b086-9e3f8d208c28" />
   <Project Path="Share.ApiTest/Share.ApiTest.csproj" Id="967ee2a4-fc17-43e2-b0c6-bab5a7cf33b7" />
   <Project Path="Shared.AppTest/Shared.AppTest.csproj" Id="3b5d293a-3eca-4c08-9e8e-ce7c4de821f4" />
   <Project Path="Shared.Database.MongoDb/Shared.Database.MongoDb.csproj" Id="c81e4ae9-f819-420e-aca2-fd831b8b5fae" />

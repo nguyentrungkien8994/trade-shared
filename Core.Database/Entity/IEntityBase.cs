@@ -1,4 +1,4 @@
-﻿namespace Core.Database.Entity;
+﻿namespace KLib.Core.Database.Entity;
 public interface IEntityBase<TId>
 {
     TId id { get; }
