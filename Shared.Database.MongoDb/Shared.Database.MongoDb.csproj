@@ -6,8 +6,7 @@
 		<Nullable>enable</Nullable>
 
 		<PackageId>Kai.Shared.Database.MongoDb</PackageId>
-		<Version>1.0.2</Version>
-		<Authors>Kai</Authors>
+		<Version>1.0.1</Version>
 		<RepositoryUrl></RepositoryUrl>
 	</PropertyGroup>
 
