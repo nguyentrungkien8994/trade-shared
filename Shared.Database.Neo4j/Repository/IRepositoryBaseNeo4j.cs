@@ -13,5 +13,7 @@ namespace Shared.Database.Neo4j.Repository
         Task<T?> InsertAsync(T entity);
         Task<int> DeleteAsync(TId id);
         Task<T?> UpdateAsync(T entity);
+        Task<int> UpSertNodeAsync(IEnumerable<object> upserts, string idKey = "id");
+        Task<int> UpSertRelationshipAsync(IEnumerable<Relationship> rels, string fromKey = "id", string toKey = "id");
     }
 }

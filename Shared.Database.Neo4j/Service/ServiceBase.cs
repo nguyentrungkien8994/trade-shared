@@ -43,6 +43,16 @@ public class ServiceBase<T, TId, IRepo> : IRepositoryBaseNeo4j<T, TId> where IRe
     {
         return _repositoryBase.UpdateAsync(entity);
     }
+
+    public Task<int> UpSertNodeAsync(IEnumerable<object> upserts, string idKey = "id")
+    {
+        return _repositoryBase.UpSertNodeAsync(upserts,idKey);
+    }
+
+    public Task<int> UpSertRelationshipAsync(IEnumerable<Relationship> rels, string fromKey = "id", string toKey = "id")
+    {
+        return _repositoryBase.UpSertRelationshipAsync(rels, fromKey, toKey);
+    }
 }
 public class ServiceBase<T, TId> : ServiceBase<T, TId, IRepositoryBaseNeo4j<T, TId>>, IServiceBaseNeo4j<T, TId> where T : IEntityBase<TId>
 {

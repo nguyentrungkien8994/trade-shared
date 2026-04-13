@@ -20,6 +20,8 @@ namespace Shared.Database.Neo4j.Service
         Task<T> InsertAsync(T entity);
         Task<int> DeleteAsync(TId id);
         Task<T> UpdateAsync(T entity);
+        Task<int> UpSertNodeAsync(IEnumerable<object> upserts, string idKey = "id");
+        Task<int> UpSertRelationshipAsync(IEnumerable<Relationship> rels, string fromKey = "id", string toKey = "id");
     }
     public interface IServiceBaseNeo4j<T, TId> : IServiceBaseNeo4j<T, TId, IRepositoryBaseNeo4j<T, TId>> where T : IEntityBase<TId>
     {
