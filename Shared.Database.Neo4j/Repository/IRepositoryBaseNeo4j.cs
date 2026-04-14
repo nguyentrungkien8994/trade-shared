@@ -17,5 +17,4 @@ public interface IRepositoryBaseNeo4j<T, TId>
     Task<T?> InsertAsync(T entity);
     Task<int> DeleteAsync(TId id);
     Task<T?> UpdateAsync(T entity);
-    Task<int> UpSertNodeAsync(IEnumerable<object> nodes, string idKey = "id");
 }

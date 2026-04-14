@@ -1,14 +1,13 @@
 ﻿
 using KLib.Core.Database.Dto;
 using KLib.Core.Database.Entity;
-using System.Linq.Expressions;
 
 namespace KLib.Core.Database;
 
 public interface IRepositoryBase
 {
     Task<IEnumerable<IDictionary<string, object>>> GetAllObjectAsync(string objName);
-    Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null);
+    Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string objName,IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null);
     Task<PagingObject<IDictionary<string, object>>> PagingObjectAsync(string objName,int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null);
 }
 public interface IRepositoryBase<T, TId> where T : IEntityKey<TId>

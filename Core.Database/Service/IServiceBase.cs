@@ -1,6 +1,5 @@
 ﻿using KLib.Core.Database.Dto;
 using KLib.Core.Database.Entity;
-using System.Linq.Expressions;
 
 namespace KLib.Core.Database;
 

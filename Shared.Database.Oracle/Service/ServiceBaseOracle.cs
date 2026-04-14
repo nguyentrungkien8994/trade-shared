@@ -1,14 +1,13 @@
-﻿using KLib.Core.Database;
-using KLib.Core.Database.Dto;
+﻿using KLib.Core.Database.Dto;
 using KLib.Core.Database.Entity;
 using Shared.Database.Oracle.Repository;
 
 namespace Shared.Database.Oracle.Service;
 
-public class ServiceBase : IServiceBaseOracle
+public class ServiceBaseOracle : IServiceBaseOracle
 {
-    private readonly IRepositoryBase _repositoryBase;
-    public ServiceBase(IRepositoryBase repositoryBase)
+    private readonly IRepositoryBaseOracle _repositoryBase;
+    public ServiceBaseOracle(IRepositoryBaseOracle repositoryBase)
     {
         _repositoryBase = repositoryBase;
     }
@@ -22,21 +21,17 @@ public class ServiceBase : IServiceBaseOracle
         return _repositoryBase.PagingObjectAsync(tableName, skip, take, filters, sort);
     }
 
-    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string tableName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
-        return _repositoryBase.SearchObjectAsync(filters, sort);
+        return _repositoryBase.SearchObjectAsync(tableName, filters, sort);
     }
 
-    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string objName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
-    {
-        throw new NotImplementedException();
-    }
 }
-public class ServiceBase<T, TId, IRepo> : IServiceBaseOracle<T, TId, IRepo> where T : IEntityKey<TId> where IRepo : IRepositoryBaseOracle<T, TId>
+public class ServiceBaseOracle<T, TId, IRepo> : IServiceBaseOracle<T, TId, IRepo> where T : IEntityKey<TId> where IRepo : IRepositoryBaseOracle<T, TId>
 {
     private readonly IRepo _repositoryBase;
 
-    public ServiceBase(IRepo repositoryBase)
+    public ServiceBaseOracle(IRepo repositoryBase)
     {
         _repositoryBase = repositoryBase;
     }
@@ -88,15 +83,15 @@ public class ServiceBase<T, TId, IRepo> : IServiceBaseOracle<T, TId, IRepo> wher
         throw new NotImplementedException();
     }
 }
-public class ServiceBase<T, TId> : ServiceBase<T, TId, IRepositoryBaseOracle<T, TId>>, IServiceBaseOracle<T, TId> where T : IEntityKey<TId>
+public class ServiceBaseOracle<T, TId> : ServiceBaseOracle<T, TId, IRepositoryBaseOracle<T, TId>>, IServiceBaseOracle<T, TId> where T : IEntityKey<TId>
 {
-    public ServiceBase(IRepositoryBaseOracle<T, TId> repositoryBase) : base(repositoryBase)
+    public ServiceBaseOracle(IRepositoryBaseOracle<T, TId> repositoryBase) : base(repositoryBase)
     {
     }
 }
-public class ServiceBase<T> : ServiceBase<T, Guid, IRepositoryBaseOracle<T, Guid>>, IServiceBaseOracle<T, Guid> where T : IEntityKey<Guid>
+public class ServiceBaseOracle<T> : ServiceBaseOracle<T, Guid, IRepositoryBaseOracle<T, Guid>>, IServiceBaseOracle<T, Guid> where T : IEntityKey<Guid>
 {
-    public ServiceBase(IRepositoryBaseOracle<T, Guid> repositoryBase) : base(repositoryBase)
+    public ServiceBaseOracle(IRepositoryBaseOracle<T, Guid> repositoryBase) : base(repositoryBase)
     {
     }
 }

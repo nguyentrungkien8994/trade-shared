@@ -16,9 +16,8 @@ namespace Shared.AppTest
     {
         private readonly IServiceBaseOracle _oracleService;
         private readonly IServiceBaseOracle<Company,int> _oracleServiceCompany;
-        private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
-        private readonly IServiceBaseNeo4j<Shared.AppTest.Entities.Neo4j.Company, int> _serviceBaseNeo4j;
-        private readonly IServiceBase _serviceNeo4j;
+        //private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
+        private readonly IServiceBaseNeo4j _serviceBaseNeo4j;
         private readonly ILogger<KafkaConsumerWorker> _logger;
         private readonly ITelegramTopicService _topicService;
         //private readonly IKafkaConsumer _kafkaConsumer;
@@ -33,9 +32,8 @@ namespace Shared.AppTest
 
         public KafkaConsumerWorker(ILogger<KafkaConsumerWorker> logger,
             ITelegramTopicService topicService,
-            IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
-            IServiceBaseNeo4j<Shared.AppTest.Entities.Neo4j.Company, int> serviceBaseNeo4j,
-            IServiceBase serviceNeo4j,
+            //IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
+            IServiceBaseNeo4j serviceBaseNeo4j,
             IServiceBaseOracle  oracleService,
         //IKafkaConsumer kafkaConsumer,
         ITradeCommandParser tradeCommandParser,
@@ -52,9 +50,7 @@ namespace Shared.AppTest
             _tradeCommandParser = tradeCommandParser;
             _topicService = topicService;
             _logger = logger;
-            _serviceBase = serviceBase;
             _serviceBaseNeo4j = serviceBaseNeo4j;
-            _serviceNeo4j = serviceNeo4j;
             _oracleService = oracleService;
             _redisStreamService = redisStreamService;
             
@@ -121,7 +117,6 @@ namespace Shared.AppTest
                 //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
                 //var a = await _serviceNeo4j.GetAllObjectAsync("TaxPayer");
 
-
                 //Oracle
                 var filters = new Dictionary<string, object>
                 {
@@ -153,6 +148,7 @@ namespace Shared.AppTest
                 //                } }
                 //            };
                 var pagingObject = await _oracleService.PagingObjectAsync("SYS_PERSON",1,50);
+                var c = await _serviceBaseNeo4j.UpSertNodeAsync(pagingObject.Data, "SYS_PERSON", "ID");
                 //var rels = pagingObject.Data.Select(x => new Shared.Database.Neo4j.Requests.Relationship() { 
                 //    FromId = x.FID,
                 //    ToId = x.TID,

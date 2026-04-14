@@ -1,22 +1,17 @@
 ﻿using KLib.Core.Database;
 using KLib.Core.Database.Dto;
 using KLib.Core.Database.Entity;
-using Neo4j.Driver;
-using Newtonsoft.Json.Linq;
 using Shared.Database.Neo4j.Builder;
 using Shared.Database.Neo4j.DataAccess;
 using Shared.Database.Neo4j.Requests;
 using Shared.Database.Neo4j.Responses;
-using System.Reflection;
-using System.Text;
-
 namespace Shared.Database.Neo4j.Repository;
 
-public class RepositoryBase : IRepositoryBaseNeo4j
+public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
 {
     private readonly IDataAccess _dataAccess;
     private readonly ICypherBuilder _cypherBuilder;
-    public RepositoryBase(IDataAccess dataAccess, ICypherBuilder cypherBuilder)
+    public RepositoryBaseNeo4j(IDataAccess dataAccess, ICypherBuilder cypherBuilder)
     {
         _dataAccess = dataAccess;
         _cypherBuilder = cypherBuilder;
@@ -32,7 +27,7 @@ public class RepositoryBase : IRepositoryBaseNeo4j
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string nodeName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
@@ -52,12 +47,12 @@ public class RepositoryBase : IRepositoryBaseNeo4j
         return summary.Counters.RelationshipsCreated;
     }
 }
-public class RepositoryBase<T, TId> : RepositoryBase, IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>
+public class RepositoryBaseNeo4j<T, TId> : RepositoryBaseNeo4j, IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>
 {
     private readonly IDataAccess _dataAccess;
     private readonly ICypherBuilder _cypherBuilder;
 
-    public RepositoryBase(IDataAccess dataAccess, ICypherBuilder cypherBuilder) : base(dataAccess, cypherBuilder)
+    public RepositoryBaseNeo4j(IDataAccess dataAccess, ICypherBuilder cypherBuilder) : base(dataAccess, cypherBuilder)
     {
         _dataAccess = dataAccess;
         _cypherBuilder = cypherBuilder;

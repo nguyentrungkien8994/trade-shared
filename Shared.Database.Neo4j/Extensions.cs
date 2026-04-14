@@ -1,5 +1,4 @@
-﻿using KLib.Core.Database;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Neo4j.Driver;
 using Shared.Database.Neo4j.Builder;
 using Shared.Database.Neo4j.DataAccess;
@@ -17,12 +16,12 @@ namespace Shared.Database.MongoDb
             );
             services.AddScoped(typeof(IDataAccess), typeof(DataAccess));
             services.AddSingleton(typeof(ICypherBuilder), typeof(CypherBuilder));
-            services.AddScoped(typeof(IRepositoryBaseNeo4j<,>), typeof(RepositoryBase<,>));
-            services.AddScoped(typeof(IRepositoryBase), typeof(RepositoryBase));
-            services.AddScoped(typeof(IServiceBaseNeo4j<,,>), typeof(ServiceBase<,,>));
-            services.AddScoped(typeof(IServiceBaseNeo4j<,>), typeof(ServiceBase<,>));
-            services.AddScoped(typeof(IServiceBaseNeo4j<>), typeof(ServiceBase<>));
-            services.AddScoped(typeof(IServiceBase), typeof(ServiceBase));
+            services.AddScoped(typeof(IRepositoryBaseNeo4j<,>), typeof(RepositoryBaseNeo4j<,>));
+            services.AddScoped(typeof(IRepositoryBaseNeo4j), typeof(RepositoryBaseNeo4j));
+            services.AddScoped(typeof(IServiceBaseNeo4j<,,>), typeof(ServiceBaseNeo4j<,,>));
+            services.AddScoped(typeof(IServiceBaseNeo4j<,>), typeof(ServiceBaseNeo4j<,>));
+            services.AddScoped(typeof(IServiceBaseNeo4j<>), typeof(ServiceBaseNeo4j<>));
+            services.AddScoped(typeof(IServiceBaseNeo4j), typeof(ServiceBaseNeo4j));
         }
         public static async Task<List<T>> ToNeo4jListAsync<T>(
         this IResultCursor cursor,

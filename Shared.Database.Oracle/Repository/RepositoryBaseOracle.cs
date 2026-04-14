@@ -5,15 +5,14 @@ using KLib.Core.Database.Entity;
 using Newtonsoft.Json;
 using Shared.Database.Oracle.Builder;
 using Shared.Database.Oracle.Factory;
-using System.Net.Http.Headers;
 namespace Shared.Database.Oracle.Repository;
 
-public class RepositoryBase : IRepositoryBase
+public class RepositoryBaseOracle : IRepositoryBaseOracle
 {
     private readonly IOracleConnectionFactory _factory;
     private readonly IOracleSqlBuilder _builderQuery;
 
-    public RepositoryBase(IOracleConnectionFactory factory, IOracleSqlBuilder builderQuery)
+    public RepositoryBaseOracle(IOracleConnectionFactory factory, IOracleSqlBuilder builderQuery)
     {
         _factory = factory;
         _builderQuery = builderQuery;
@@ -40,19 +39,19 @@ public class RepositoryBase : IRepositoryBase
         return new PagingObject<IDictionary<string, object>> { Data = data, Skip=skip, Take= take, TotalCount = 0 };
     }
 
-    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string tableName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 }
-public class RepositoryBase<T, TId> : IRepositoryBase<T, TId> where T : IEntityKey<TId>
+public class RepositoryBaseOracle<T, TId> : IRepositoryBaseOracle<T, TId> where T : IEntityKey<TId>
 {
     private readonly IOracleConnectionFactory _factory;
     private readonly IOracleSqlBuilder _builderQuery;
 
     private readonly string _tableName;
 
-    public RepositoryBase(IOracleConnectionFactory factory, IOracleSqlBuilder builderQuery)
+    public RepositoryBaseOracle(IOracleConnectionFactory factory, IOracleSqlBuilder builderQuery)
     {
         _factory = factory;
         _tableName = EntityMetadata.GetTableName(typeof(T)); // hoặc custom mapping
