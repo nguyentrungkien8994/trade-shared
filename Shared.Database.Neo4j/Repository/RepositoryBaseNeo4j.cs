@@ -22,7 +22,13 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
         return _dataAccess.ReadAsync(cypher);
     }
 
+
     public Task<PagingObject<IDictionary<string, object>>> PagingObjectAsync(string nodeName, int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<PagingObject<string>> PagingObjectJsonAsync(string objName, int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
@@ -31,6 +37,7 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
     {
         throw new NotImplementedException();
     }
+
 
     public virtual async Task<int> UpSertNodeAsync(IEnumerable<IDictionary<string, object>> nodes, string nodeName, string idKey = "id")
     {

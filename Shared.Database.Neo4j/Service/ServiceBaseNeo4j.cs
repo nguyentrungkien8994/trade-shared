@@ -18,14 +18,29 @@ public class ServiceBaseNeo4j : IServiceBaseNeo4j
         return _repositoryBase.GetAllObjectAsync(nodeName);
     }
 
+    public Task<string> GetAllObjectJsonAsync(string objName)
+    {
+        throw new NotImplementedException();
+    }
+
     public virtual Task<PagingObject<IDictionary<string, object>>> PagingObjectAsync(string nodeName, int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         return _repositoryBase.PagingObjectAsync(nodeName, skip, take, filters, sort);
     }
 
+    public Task<PagingObject<string>> PagingObjectJsonAsync(string objName, int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    {
+        throw new NotImplementedException();
+    }
+
     public virtual Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string objName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         return _repositoryBase.SearchObjectAsync(objName, filters, sort);
+    }
+
+    public Task<string> SearchObjectJsonAsync(string objName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    {
+        throw new NotImplementedException();
     }
 
     public Task<int> UpSertNodeAsync(IEnumerable<IDictionary<string, object>> nodes, string nodeName, string idKey = "id")

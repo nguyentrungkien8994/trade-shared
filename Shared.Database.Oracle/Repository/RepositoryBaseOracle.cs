@@ -39,10 +39,17 @@ public class RepositoryBaseOracle : IRepositoryBaseOracle
         return new PagingObject<IDictionary<string, object>> { Data = data, Skip=skip, Take= take, TotalCount = 0 };
     }
 
-    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string tableName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public virtual async Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string tableName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
-        throw new NotImplementedException();
+        using var conn = await _factory.CreateAsync();
+        (string sql, object param) = _builderQuery.BuildPaging(tableName, 0, 500, filters, sort);
+        var res = await conn.QueryAsync(sql, param);
+        string json = JsonConvert.SerializeObject(res);
+        var parserResult = JsonConvert.DeserializeObject<IEnumerable<IDictionary<string, object>>>(json);
+        var data = (parserResult == null) ? Enumerable.Empty<IDictionary<string, object>>() : parserResult;
+        return data;
     }
+
 }
 public class RepositoryBaseOracle<T, TId> : IRepositoryBaseOracle<T, TId> where T : IEntityKey<TId>
 {
@@ -58,12 +65,12 @@ public class RepositoryBaseOracle<T, TId> : IRepositoryBaseOracle<T, TId> where 
         _builderQuery = builderQuery;
     }
 
-    public Task<int> DeleteAsync(TId id)
+    public virtual Task<int> DeleteAsync(TId id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public virtual async Task<IEnumerable<T>> GetAllAsync()
     {
         using var conn = await _factory.CreateAsync();
         var sql = _builderQuery.BuildGetAll(typeof(T).GetTableName());
@@ -71,7 +78,7 @@ public class RepositoryBaseOracle<T, TId> : IRepositoryBaseOracle<T, TId> where 
         return res == null ? new() : res.ToList();
     }
 
-    public async Task<T?> GetAsync(TId id)
+    public virtual async Task<T?> GetAsync(TId id)
     {
         using var conn = await _factory.CreateAsync();
 
@@ -80,22 +87,22 @@ public class RepositoryBaseOracle<T, TId> : IRepositoryBaseOracle<T, TId> where 
         return res;
     }
 
-    public Task<int> InsertAsync(T entity)
+    public virtual Task<int> InsertAsync(T entity)
     {
         throw new NotImplementedException();
     }
 
-    public Task<int> InsertBulkAsync(T[] entities)
+    public virtual Task<int> InsertBulkAsync(T[] entities)
     {
         throw new NotImplementedException();
     }
 
-    public Task<PagingObject<T>> PagingAsync(int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public virtual Task<PagingObject<T>> PagingAsync(int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<IEnumerable<T>> SearchAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public virtual async Task<IEnumerable<T>> SearchAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         using var conn = await _factory.CreateAsync();
 
@@ -113,12 +120,12 @@ public class RepositoryBaseOracle<T, TId> : IRepositoryBaseOracle<T, TId> where 
         return await conn.QueryAsync<T>(sql, parameters);
     }
 
-    public Task<T?> SearchOneAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public virtual Task<T?> SearchOneAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<int> UpdateAsync(T entity)
+    public virtual Task<int> UpdateAsync(T entity)
     {
         throw new NotImplementedException();
     }
