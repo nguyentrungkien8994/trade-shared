@@ -1,4 +1,5 @@
 ﻿using Neo4j.Driver;
+using Neo4j.Driver.Mapping;
 using Shared.Database.MongoDb;
 
 namespace Shared.Database.Neo4j.DataAccess
@@ -19,6 +20,18 @@ namespace Shared.Database.Neo4j.DataAccess
             {
                 var cursor = await tx.RunAsync(cypher, parameters);
                 return await cursor.ToNeo4jListAsync<T>();
+            });
+        }
+
+        public async Task<IEnumerable<IDictionary<string, object>>> ReadAsync(string cypher, object? parameters = null)
+        {
+            await using var session = _driver.AsyncSession(o =>
+             o.WithDefaultAccessMode(AccessMode.Read));
+
+            return await session.ExecuteReadAsync(async tx =>
+            {
+                var cursor = await tx.RunAsync(cypher, parameters);
+                return await cursor.ToListDictionaryAsync();
             });
         }
 

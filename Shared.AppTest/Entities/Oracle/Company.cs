@@ -9,17 +9,9 @@ using System.Threading.Tasks;
 namespace Shared.AppTest.Entities.Oracle
 {
     [Table("SYS_COMPANY")]
-    public class Company : IEntityBase<int>
+    public class Company : IEntityKey<int>
     {
-        public int id { get; set; }
-
-        public string created_by { get; set; }
-
-        public string updated_by { get; set; }
-
-        public long created_at { get; set; }
-
-        public long updated_at { get; set; }
+        public int entityId { get; set; }
         public string TICKER { get; set; }
         public string FOREIGNOWNERSHIPRATIONAME { get; set; }
         public decimal OUTSTANDINGSHARE { get; set; }

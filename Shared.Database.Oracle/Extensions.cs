@@ -21,11 +21,13 @@ namespace Shared.Database.MongoDb
 
             // ================= REPOSITORY =================
             services.AddScoped(typeof(IRepositoryBaseOracle<,>), typeof(RepositoryBase<,>));
+            services.AddScoped(typeof(IRepositoryBase), typeof(RepositoryBase));
 
             // ================= SERVICE BASE =================
             services.AddScoped(typeof(IServiceBaseOracle<,,>), typeof(ServiceBase<,,>));
             services.AddScoped(typeof(IServiceBaseOracle<,>), typeof(ServiceBase<,>));
             services.AddScoped(typeof(IServiceBaseOracle<>), typeof(ServiceBase<>));
+            services.AddScoped(typeof(IServiceBaseOracle), typeof(ServiceBase));
 
             return services;
         }

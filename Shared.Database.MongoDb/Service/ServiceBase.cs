@@ -1,11 +1,12 @@
 ﻿using KLib.Core.Database;
+using KLib.Core.Database.Dto;
 using KLib.Core.Database.Entity;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
 
 namespace Shared.Database.MongoDb.Service;
 
-public class ServiceBase<T, TId, IRepo> : IServiceBase<T, TId, IRepo> where T : IEntityBase<TId> where IRepo : IRepositoryBase<T, TId>
+public class ServiceBase<T, TId, IRepo> : IServiceBase<T, TId, IRepo> where T : IEntityKey<TId> where IRepo : IRepositoryBase<T, TId>
 {
     private readonly IRepo _repositoryBase;
 
@@ -16,89 +17,58 @@ public class ServiceBase<T, TId, IRepo> : IServiceBase<T, TId, IRepo> where T : 
 
     public IRepo Repository => _repositoryBase;
 
-
-    public Task<long> CountAsync(Expression<Func<T, bool>> expression)
-    {
-        return _repositoryBase.CountAsync(expression);
-    }
-
     public Task<int> DeleteAsync(TId id)
     {
-        return _repositoryBase.DeleteAsync(id);
+        throw new NotImplementedException();
     }
 
-    public Task<int> DeleteRangeAsync(T[] entities)
+    public Task<IEnumerable<T>> GetAllAsync()
     {
-        return _repositoryBase.DeleteRangeAsync(entities);
+        throw new NotImplementedException();
     }
 
-    public Task<List<T>> GetAllAsync()
+    public Task<T?> GetAsync(TId id)
     {
-        return _repositoryBase.GetAllAsync();
-    }
-
-    public Task<T> GetAsync(TId id)
-    {
-        return _repositoryBase.GetAsync(id);
+        throw new NotImplementedException();
     }
 
     public Task<int> InsertAsync(T entity)
     {
-        return (_repositoryBase.InsertAsync(entity));
+        throw new NotImplementedException();
     }
 
-    public Task<int> InsertRangeAsync(T[] entities)
-    {
-        return _repositoryBase.InsertRangeAsync(entities);
-    }
-
-    public Task<List<T>> SearchAsync(Expression<Func<T, bool>> expression)
-    {
-        return _repositoryBase.SearchAsync(expression);
-    }
-
-    public Task<List<T>> SearchBySqlRawAsync(string sqlText, params object[] parameters)
-    {
-        return _repositoryBase.SearchBySqlRawAsync<T>(sqlText, parameters);
-    }
-
-    public Task<List<TResult>> SearchBySqlRawAsync<TResult>(string sqlText, params object[] parameters)
+    public Task<int> InsertBulkAsync(T[] entities)
     {
         throw new NotImplementedException();
     }
 
-    public Task<T> SearchOnceBySqlRawAsync(string sqlText, params object[] parameters)
+    public Task<PagingObject<T>> PagingAsync(int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TResult?> SearchOnceBySqlRawAsync<TResult>(string sqlText, params object[] parameters)
+    public Task<IEnumerable<T>> SearchAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<T> SearchOneAsync(Expression<Func<T, bool>> expression)
+    public Task<T?> SearchOneAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
-        return _repositoryBase.SearchOneAsync(expression);
+        throw new NotImplementedException();
     }
 
     public Task<int> UpdateAsync(T entity)
     {
-        return _repositoryBase.UpdateAsync(entity);
-    }
-
-    public Task<int> UpdateRangeAsync(T[] entities)
-    {
-        return _repositoryBase.UpdateRangeAsync(entities);
+        throw new NotImplementedException();
     }
 }
-public class ServiceBase<T, TId> : ServiceBase<T, TId, IRepositoryBase<T, TId>>, IServiceBase<T, TId> where T : IEntityBase<TId>
+public class ServiceBase<T, TId> : ServiceBase<T, TId, IRepositoryBase<T, TId>>, IServiceBase<T, TId> where T : IEntityKey<TId>
 {
     public ServiceBase(IRepositoryBase<T, TId> repositoryBase) : base(repositoryBase)
     {
     }
 }
-public class ServiceBase<T> : ServiceBase<T, Guid, IRepositoryBase<T, Guid>>, IServiceBase<T, Guid> where T : IEntityBase<Guid>
+public class ServiceBase<T> : ServiceBase<T, Guid, IRepositoryBase<T, Guid>>, IServiceBase<T, Guid> where T : IEntityKey<Guid>
 {
     public ServiceBase(IRepositoryBase<T, Guid> repositoryBase) : base(repositoryBase)
     {

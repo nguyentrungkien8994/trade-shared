@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Database.Neo4j.Service
 {
-    public interface IServiceBaseNeo4j<T, TId, IRepo> where T : IEntityBase<TId> where IRepo : IRepositoryBaseNeo4j<T, TId>
+    public interface IServiceBaseNeo4j<T, TId, IRepo> where T : IEntityKey<TId> where IRepo : IRepositoryBaseNeo4j<T, TId>
     {
         Task<T> GetAsync(TId id);
         Task<IEnumerable<T>> GetAllAsync();
@@ -23,11 +23,11 @@ namespace Shared.Database.Neo4j.Service
         Task<int> UpSertNodeAsync(IEnumerable<object> upserts, string idKey = "id");
         Task<int> UpSertRelationshipAsync(IEnumerable<Relationship> rels, string fromKey = "id", string toKey = "id");
     }
-    public interface IServiceBaseNeo4j<T, TId> : IServiceBaseNeo4j<T, TId, IRepositoryBaseNeo4j<T, TId>> where T : IEntityBase<TId>
+    public interface IServiceBaseNeo4j<T, TId> : IServiceBaseNeo4j<T, TId, IRepositoryBaseNeo4j<T, TId>> where T : IEntityKey<TId>
     {
 
     }
-    public interface IServiceBaseNeo4j<T> : IServiceBaseNeo4j<T, Guid> where T : IEntityBase<Guid>
+    public interface IServiceBaseNeo4j<T> : IServiceBaseNeo4j<T, Guid> where T : IEntityKey<Guid>
     {
 
     }

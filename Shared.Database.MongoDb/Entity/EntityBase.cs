@@ -4,12 +4,12 @@ using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 namespace Shared.Database.MongoDb.Entity;
 
-public class EntityBase : IEntityBase<ObjectId>
+public class EntityBase : IEntityKey<ObjectId>
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     [JsonConverter(typeof(ObjectIdJsonConverter))]
-    public ObjectId id { get; set; }
+    public ObjectId entityId { get; set; }
     public long created_at { get; set; }
     public long updated_at { get; set; }
     public required string created_by { get; set; }

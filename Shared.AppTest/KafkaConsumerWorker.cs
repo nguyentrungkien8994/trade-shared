@@ -14,9 +14,11 @@ namespace Shared.AppTest
 {
     public sealed class KafkaConsumerWorker : BackgroundService
     {
-        private readonly IServiceBaseOracle<Relationship, int> _oracleService;
+        private readonly IServiceBaseOracle _oracleService;
+        private readonly IServiceBaseOracle<Company,int> _oracleServiceCompany;
         private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
         private readonly IServiceBaseNeo4j<Shared.AppTest.Entities.Neo4j.Company, int> _serviceBaseNeo4j;
+        private readonly IServiceBase _serviceNeo4j;
         private readonly ILogger<KafkaConsumerWorker> _logger;
         private readonly ITelegramTopicService _topicService;
         //private readonly IKafkaConsumer _kafkaConsumer;
@@ -33,7 +35,8 @@ namespace Shared.AppTest
             ITelegramTopicService topicService,
             IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
             IServiceBaseNeo4j<Shared.AppTest.Entities.Neo4j.Company, int> serviceBaseNeo4j,
-            IServiceBaseOracle<Relationship, int> oracleService,
+            IServiceBase serviceNeo4j,
+            IServiceBaseOracle  oracleService,
         //IKafkaConsumer kafkaConsumer,
         ITradeCommandParser tradeCommandParser,
             IRedisStreamService redisStreamService
@@ -51,9 +54,10 @@ namespace Shared.AppTest
             _logger = logger;
             _serviceBase = serviceBase;
             _serviceBaseNeo4j = serviceBaseNeo4j;
+            _serviceNeo4j = serviceNeo4j;
             _oracleService = oracleService;
             _redisStreamService = redisStreamService;
-
+            
         }
         private string ImageToBase64(string filePath)
         {
@@ -115,7 +119,7 @@ namespace Shared.AppTest
                 //Utils utils = new();
                 //var b = utils.Parse(json);
                 //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
-                
+                //var a = await _serviceNeo4j.GetAllObjectAsync("TaxPayer");
 
 
                 //Oracle
@@ -148,17 +152,19 @@ namespace Shared.AppTest
 
                 //                } }
                 //            };
-                var pagingObject = await _oracleService.GetPaging(0, 10, filters);
-                var rels = pagingObject.Data.Select(x => new Shared.Database.Neo4j.Requests.Relationship() { 
-                    FromId = x.FID,
-                    ToId = x.TID,
-                    FromNode = x.FNODE,
-                    ToNode = x.TNODE,
-                    RelationName = x.RELATION_NAME
-                });
-                await _serviceBaseNeo4j.UpSertRelationshipAsync(rels,fromKey:"ID", toKey:"TICKER");
+                var pagingObject = await _oracleService.PagingObjectAsync("SYS_PERSON",1,50);
+                //var rels = pagingObject.Data.Select(x => new Shared.Database.Neo4j.Requests.Relationship() { 
+                //    FromId = x.FID,
+                //    ToId = x.TID,
+                //    FromNode = x.FNODE,
+                //    ToNode = x.TNODE,
+                //    RelationName = x.RELATION_NAME
+                //});
+                //await _serviceBaseNeo4j.UpSertRelationshipAsync(rels,fromKey:"ID", toKey:"TICKER");
                 //await _serviceBaseNeo4j.UpSertNodeAsync(pagingObject.Data,"TICKER");
                 //var b = 1;
+
+
 
                 //OpenAI
                 //var rs = await _tradeCommandParser.ParseAsync("LONG LIMIT TAO Entry: 312.8 SL: 304.6 (≤ 2.62%) Risk: 2.0% ");

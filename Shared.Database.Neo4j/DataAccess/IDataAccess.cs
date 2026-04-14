@@ -11,6 +11,7 @@ namespace Shared.Database.Neo4j.DataAccess
     {
         // READ
         Task<IEnumerable<T>> ReadAsync<T>(string cypher,object? parameters = null);
+        Task<IEnumerable<IDictionary<string,object>>> ReadAsync(string cypher,object? parameters = null);
         Task<IEnumerable<IRecord>> ReadMultipleNodeAsync(string cypher, object? parameters = null);
 
         // WRITE

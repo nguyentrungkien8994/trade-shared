@@ -4,8 +4,6 @@ using KLib.Core.Database.Entity;
 
 namespace Shared.Database.Oracle.Repository;
 
-public interface IRepositoryBaseOracle<T, TId> : IRepositoryBase<T, TId> where T : IEntityBase<TId>
+public interface IRepositoryBaseOracle<T, TId> : IRepositoryBase<T, TId> where T : IEntityKey<TId>
 {
-    Task<PagingObject<T>> GetPaging(int skip, int take, IDictionary<string, object>? filters=null, IEnumerable<(string field, bool desc)>? sort = null);
-    Task<IEnumerable<T>> Search(IDictionary<string, object>? filters=null);
 }

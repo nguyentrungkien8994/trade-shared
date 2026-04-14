@@ -4,7 +4,7 @@ using Shared.Database.Oracle.Attributes;
 namespace Shared.AppTest.Entities.Oracle
 {
     [Table("SYS_RELATIONSHIP")]
-    public class Relationship : IEntityBase<int>
+    public class Relationship : IEntityKey<int>
     {
         public string FNODE { get; set; }
         public object FID { get; set; }
@@ -13,7 +13,7 @@ namespace Shared.AppTest.Entities.Oracle
         public int SYNC_STATUS { get; set; }
         public string RELATION_NAME { get; set; }
 
-        public int id { get; set; }
+        public int entityId { get; set; }
 
         public string created_by { get; set; }
 

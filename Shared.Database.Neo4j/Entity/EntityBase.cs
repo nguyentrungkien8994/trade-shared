@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 namespace Shared.Database.Neo4j.Entity;
 
-public class EntityBase<TId> : IEntityBase<TId>
+public class EntityBase<TId> : IEntityKey<TId>
 {
-    public required TId id { get; set; }
+    public required TId entityId { get; set; }
     public long created_at { get; set; }
     public long updated_at { get; set; }
     public required string created_by { get; set; }

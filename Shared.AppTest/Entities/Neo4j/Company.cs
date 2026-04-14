@@ -4,9 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Shared.AppTest.Entities.Neo4j
 {
     [Table("SYS_COMPANY")]
-    public class Company : IEntityBase<int>
+    public class Company : IEntityKey<int>
     {
-        public int id { get; set; }
+        public int entityId { get; set; }
 
         public string created_by { get; set; }
 

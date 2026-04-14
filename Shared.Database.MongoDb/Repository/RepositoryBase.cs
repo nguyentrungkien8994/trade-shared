@@ -2,10 +2,11 @@
 using System.Linq.Expressions;
 using KLib.Core.Database;
 using KLib.Core.Database.Entity;
+using KLib.Core.Database.Dto;
 
 namespace Shared.Database.MongoDb.Repository;
 
-public class RepositoryBase<T, TId> : IRepositoryBase<T, TId> where T : IEntityBase<TId>
+public class RepositoryBase<T, TId> : IRepositoryBase<T, TId> where T : IEntityKey<TId>
 {
     private readonly IMongoCollection<T> _collection;
     MongoDBContext _dbContext;
@@ -21,83 +22,48 @@ public class RepositoryBase<T, TId> : IRepositoryBase<T, TId> where T : IEntityB
         _dbContext = dbContext;
         _collection = dbContext.GetCollection<T>(typeof(T).GetTableName());
     }
-    public Task<long> CountAsync(Expression<Func<T, bool>> expression)
+
+    public Task<T?> GetAsync(TId id)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<int> DeleteAsync(TId id)
-    {
-        var filter = Builders<T>.Filter.Eq(x => x.id, id);
-        var result = _collection.DeleteOneAsync(filter);
-        return 1;
-    }
-
-    public Task<int> DeleteRangeAsync(T[] entities)
+    public Task<IEnumerable<T>> GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<T>> GetAllAsync()
-    {
-        return _collection.Find(_ => true).ToListAsync();
-    }
-
-    public Task<T> GetAsync(TId id)
-    {
-        var filter = Builders<T>.Filter.Eq(x => x.id, id);
-        return _collection.Find(filter).FirstOrDefaultAsync();
-    }
-
-    public async Task<int> InsertAsync(T entity)
-    {
-        await _collection.InsertOneAsync(entity);
-        return 1;
-    }
-
-    public Task<int> InsertRangeAsync(T[] entities)
+    public Task<T?> SearchOneAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<T>> SearchAsync(Expression<Func<T, bool>> expression)
-    {
-        return _collection.Find(expression).ToListAsync();
-    }
-
-    public Task<List<T>> SearchBySqlRawAsync(string sqlText, params object[] parameters)
+    public Task<IEnumerable<T>> SearchAsync(IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<List<TResult>> SearchBySqlRawAsync<TResult>(string sqlText, params object[] parameters)
+    public Task<PagingObject<T>> PagingAsync(int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<T> SearchOnceBySqlRawAsync(string sqlText, params object[] parameters)
+    public Task<int> InsertAsync(T entity)
     {
         throw new NotImplementedException();
     }
 
-    public Task<TResult?> SearchOnceBySqlRawAsync<TResult>(string sqlText, params object[] parameters)
+    public Task<int> UpdateAsync(T entity)
     {
         throw new NotImplementedException();
     }
 
-    public Task<T> SearchOneAsync(Expression<Func<T, bool>> expression)
+    public Task<int> DeleteAsync(TId id)
     {
-        return _collection.Find(expression).FirstOrDefaultAsync();
+        throw new NotImplementedException();
     }
 
-    public async Task<int> UpdateAsync(T entity)
-    {
-        var filter = Builders<T>.Filter.Eq(x => x.id, entity.id);
-        var result = await _collection.ReplaceOneAsync(filter, entity);
-        return 1;
-    }
-
-    public Task<int> UpdateRangeAsync(T[] entities)
+    public Task<int> InsertBulkAsync(T[] entities)
     {
         throw new NotImplementedException();
     }

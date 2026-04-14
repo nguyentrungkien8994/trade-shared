@@ -1,7 +1,7 @@
 ﻿using KLib.Core.Database;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Neo4j.Driver;
+using Shared.Database.Neo4j.Builder;
 using Shared.Database.Neo4j.DataAccess;
 using Shared.Database.Neo4j.Repository;
 using Shared.Database.Neo4j.Service;
@@ -16,10 +16,13 @@ namespace Shared.Database.MongoDb
                 GraphDatabase.Driver(uri, AuthTokens.Basic(username, password))
             );
             services.AddScoped(typeof(IDataAccess), typeof(DataAccess));
+            services.AddSingleton(typeof(ICypherBuilder), typeof(CypherBuilder));
             services.AddScoped(typeof(IRepositoryBaseNeo4j<,>), typeof(RepositoryBase<,>));
+            services.AddScoped(typeof(IRepositoryBase), typeof(RepositoryBase));
             services.AddScoped(typeof(IServiceBaseNeo4j<,,>), typeof(ServiceBase<,,>));
             services.AddScoped(typeof(IServiceBaseNeo4j<,>), typeof(ServiceBase<,>));
             services.AddScoped(typeof(IServiceBaseNeo4j<>), typeof(ServiceBase<>));
+            services.AddScoped(typeof(IServiceBase), typeof(ServiceBase));
         }
         public static async Task<List<T>> ToNeo4jListAsync<T>(
         this IResultCursor cursor,
@@ -38,6 +41,28 @@ namespace Shared.Database.MongoDb
                 }
 
                 list.Add(record.ToRecord<T>());
+            }
+
+            return list;
+        }
+
+        public static async Task<IEnumerable<IDictionary<string, object>>> ToListDictionaryAsync(
+        this IResultCursor cursor,
+        Func<IRecord, IDictionary<string, object>>? customMap = null)
+        {
+            var list = new List<IDictionary<string, object>>();
+
+            while (await cursor.FetchAsync())
+            {
+                var record = cursor.Current;
+
+                if (customMap != null)
+                {
+                    list.Add(customMap(record));
+                    continue;
+                }
+                var dic = record.ToNeo4jDictionary();
+                list.Add(dic.ToDictionary<string, object>());
             }
 
             return list;
@@ -62,11 +87,28 @@ namespace Shared.Database.MongoDb
             // Case 3: fallback convert
             return (T)Convert.ChangeType(value, typeof(T));
         }
+        public static IReadOnlyDictionary<string, object> ToNeo4jDictionary(this IRecord record)
+        {
+            var value = record.Values.Values.FirstOrDefault();
+
+            if (value == null)
+                return default!;
+
+            // Case 1: Node
+            if (value is INode node)
+                return node.Properties;
+
+            // Case 2: Primitive / scalar
+            if (value is IReadOnlyDictionary<string, object> tValue)
+                return tValue;
+
+            // Case 3: fallback convert
+            return default!;
+        }
 
         private static T MapNode<T>(INode node)
         {
             var entity = Activator.CreateInstance<T>();
-
             var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
             foreach (var prop in props)
