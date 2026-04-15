@@ -10,13 +10,11 @@
 		<RepositoryUrl></RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="KLib.Core.Database" />
 		<PackageReference Include="Microsoft.Extensions.Options" />
 		<PackageReference Include="Newtonsoft.Json" />
 		<PackageReference Include="Dapper" />
 		<PackageReference Include="Oracle.ManagedDataAccess.Core" />
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\Core.Database\KLib.Core.Database.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Entity\" />
