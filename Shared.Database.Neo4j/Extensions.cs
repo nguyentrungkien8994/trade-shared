@@ -15,7 +15,7 @@ namespace Shared.Database.MongoDb
                 GraphDatabase.Driver(uri, AuthTokens.Basic(username, password))
             );
             services.AddScoped(typeof(IDataAccess), typeof(DataAccess));
-            services.AddSingleton(typeof(ICypherBuilder), typeof(CypherBuilder));
+            services.AddTransient(typeof(ICypherBuilder), typeof(CypherBuilder));
             services.AddScoped(typeof(IRepositoryBaseNeo4j<,>), typeof(RepositoryBaseNeo4j<,>));
             services.AddScoped(typeof(IRepositoryBaseNeo4j), typeof(RepositoryBaseNeo4j));
             services.AddScoped(typeof(IServiceBaseNeo4j<,,>), typeof(ServiceBaseNeo4j<,,>));

@@ -2,8 +2,10 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using Newtonsoft.Json;
 using Shared.AppTest.Entities;
 using Shared.AppTest.Entities.Oracle;
+using Shared.Database.Neo4j.Requests;
 using Shared.Database.Neo4j.Service;
 using Shared.Database.Oracle.Service;
 using Shared.OpenAI;
@@ -15,7 +17,7 @@ namespace Shared.AppTest
     public sealed class KafkaConsumerWorker : BackgroundService
     {
         private readonly IServiceBaseOracle _oracleService;
-        private readonly IServiceBaseOracle<Company,int> _oracleServiceCompany;
+        private readonly IServiceBaseOracle<Company, int> _oracleServiceCompany;
         //private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
         private readonly IServiceBaseNeo4j _serviceBaseNeo4j;
         private readonly ILogger<KafkaConsumerWorker> _logger;
@@ -34,7 +36,7 @@ namespace Shared.AppTest
             ITelegramTopicService topicService,
             //IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> serviceBase,
             IServiceBaseNeo4j serviceBaseNeo4j,
-            IServiceBaseOracle  oracleService,
+            IServiceBaseOracle oracleService,
         //IKafkaConsumer kafkaConsumer,
         ITradeCommandParser tradeCommandParser,
             IRedisStreamService redisStreamService
@@ -53,7 +55,7 @@ namespace Shared.AppTest
             _serviceBaseNeo4j = serviceBaseNeo4j;
             _oracleService = oracleService;
             _redisStreamService = redisStreamService;
-            
+
         }
         private string ImageToBase64(string filePath)
         {
@@ -111,28 +113,31 @@ namespace Shared.AppTest
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]}}";
-                //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
+                string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
+                SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
+                var c = await _serviceBaseNeo4j.SearchNode(searchParam);
+                var a = 1;
                 //Utils utils = new();
                 //var b = utils.Parse(json);
                 //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
                 //var a = await _serviceNeo4j.GetAllObjectAsync("TaxPayer");
 
                 //Oracle
-                var filters = new Dictionary<string, object>
-                {
-                    { "$and", new object[]
-                        {
-                            new Dictionary<string, object>
-                            {
-                                { "SYNC_STATUS", new Dictionary<string, object> { { "$eq", 0 } } }
-                            },
-                            new Dictionary<string, object>
-                            {
-                                { "TID", new Dictionary<string, object> { { "$eq", "ATB" } } }
-                            }
-                        }
-                    }
-                };
+                //var filters = new Dictionary<string, object>
+                //{
+                //    { "$and", new object[]
+                //        {
+                //            new Dictionary<string, object>
+                //            {
+                //                { "SYNC_STATUS", new Dictionary<string, object> { { "$eq", 0 } } }
+                //            },
+                //            new Dictionary<string, object>
+                //            {
+                //                { "TID", new Dictionary<string, object> { { "$eq", "ATB" } } }
+                //            }
+                //        }
+                //    }
+                //};
                 //var filters = new Dictionary<string, object>
                 //            {
                 //                {"$or", new object[]{
@@ -147,8 +152,8 @@ namespace Shared.AppTest
 
                 //                } }
                 //            };
-                var pagingObject = await _oracleService.PagingObjectAsync("SYS_PERSON",1,50);
-                var c = await _serviceBaseNeo4j.UpSertNodeAsync(pagingObject.Data, "SYS_PERSON", "ID");
+                //var pagingObject = await _oracleService.PagingObjectAsync("SYS_PERSON",1,50);
+                //var c = await _serviceBaseNeo4j.UpSertNodeAsync(pagingObject.Data, "SYS_PERSON", "ID");
                 //var rels = pagingObject.Data.Select(x => new Shared.Database.Neo4j.Requests.Relationship() { 
                 //    FromId = x.FID,
                 //    ToId = x.TID,

@@ -16,24 +16,18 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
         _dataAccess = dataAccess;
         _cypherBuilder = cypherBuilder;
     }
-    public Task<IEnumerable<IDictionary<string, object>>> GetAllObjectAsync(string nodeName)
+    public virtual Task<IEnumerable<IDictionary<string, object>>> GetAllObjectAsync(string nodeName)
     {
         string cypher = _cypherBuilder.BuildGetAll(nodeName);
         return _dataAccess.ReadAsync(cypher);
     }
 
-
-    public Task<PagingObject<IDictionary<string, object>>> PagingObjectAsync(string nodeName, int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public virtual Task<PagingObject<IDictionary<string, object>>> PagingObjectAsync(string nodeName, int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
 
-    public Task<PagingObject<string>> PagingObjectJsonAsync(string objName, int skip, int take, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string nodeName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
+    public virtual Task<IEnumerable<IDictionary<string, object>>> SearchObjectAsync(string nodeName, IDictionary<string, object>? filters = null, IEnumerable<(string field, bool desc)>? sort = null)
     {
         throw new NotImplementedException();
     }
@@ -52,6 +46,15 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
         (string cypher, object parameters) = _cypherBuilder.BuildMergeRelationship(rels, fromKey, toKey);
         var summary = await _dataAccess.WriteScalarAsync(cypher, parameters);
         return summary.Counters.RelationshipsCreated;
+    }
+    public virtual async Task<object?> SearchNode(SearchParam searchParam)
+    {
+        CypherQuery cypher = _cypherBuilder.BuildDynamicCypher(searchParam);
+        if (cypher == null) return null;
+        var records = await _dataAccess.WriteAsync(cypher.Query, cypher.Params);
+        Utils utils = new();
+        var results = utils.ParserRecords(records);
+        return results;
     }
 }
 public class RepositoryBaseNeo4j<T, TId> : RepositoryBaseNeo4j, IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>
@@ -95,22 +98,5 @@ public class RepositoryBaseNeo4j<T, TId> : RepositoryBaseNeo4j, IRepositoryBaseN
     {
         (string cypher, object parameters) = _cypherBuilder.BuildUpdate<T>(entity);
         return await _dataAccess.WriteAsync<T>(cypher, parameters);
-    }
-
-    public virtual async Task<object?> SearchNode(CypherQuery cypher)
-    {
-        if (cypher == null) return null;
-        var records = await _dataAccess.WriteAsync(cypher.Query, cypher.Params);
-        Utils utils = new();
-        var results = utils.ParserRecords(records);
-        return results;
-    }
-
-    public virtual async Task<int> UpSertNodeAsync(IEnumerable<object> upserts, string idKey = "id")
-    {
-        if (upserts == null || upserts.Count() == 0) return 0;
-        (string cypher, object parameters) = _cypherBuilder.BuildMergeNode<T>(upserts, idKey);
-        var summary = await _dataAccess.WriteScalarAsync(cypher, parameters);
-        return summary.Counters.NodesCreated;
     }
 }
