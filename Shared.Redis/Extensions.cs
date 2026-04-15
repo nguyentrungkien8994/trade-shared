@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Shared.Redis;
+using Shared.Redis.Implementions;
 using StackExchange.Redis;
 
 public static class Extensions
@@ -23,6 +24,7 @@ public static class Extensions
 
         // 🔥 thêm stream
         services.AddSingleton<IRedisStreamService, RedisStreamService>();
+        services.AddSingleton<IRedisStreamPublisher, RedisStreamPublisher>();
 
         return services;
     }
