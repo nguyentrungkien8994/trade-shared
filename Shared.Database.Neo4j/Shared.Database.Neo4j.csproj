@@ -5,17 +5,15 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<PackageId>Kai.Shared.Database.Neo4j</PackageId>
-		<Version>1.0.8</Version>
+		<Version>1.0.9</Version>
 		<Authors>Kai</Authors>
 		<RepositoryUrl></RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="KLib.Core.Database" />
 		<PackageReference Include="Microsoft.Extensions.Options" />
 		<PackageReference Include="Newtonsoft.Json" />
 		<PackageReference Include="Neo4j.Driver" />
-	</ItemGroup>
-	<ItemGroup>
-	  <ProjectReference Include="..\Core.Database\KLib.Core.Database.csproj" />
 	</ItemGroup>
 
 </Project>
