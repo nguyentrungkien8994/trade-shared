@@ -12,7 +12,8 @@ namespace Shared.AppTest
         /// add confluent kafka connection
         /// </summary>
         /// <param name="services"></param>
-        public static void AddConfluentKafka(this IServiceCollection services, string bootstrap, string groupId, string topic) {
+        public static void AddConfluentKafka(this IServiceCollection services, string bootstrap, string groupId, string topic)
+        {
             // Kafka options
             services.AddSingleton<IOptions<KafkaOptions>>(
                 Options.Create(new KafkaOptions

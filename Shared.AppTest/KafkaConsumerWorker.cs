@@ -113,9 +113,10 @@ namespace Shared.AppTest
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]}}";
-                string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
+                //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"$or\":[{\"$and\":[{\"id\":{\"$gte\":2}},{\"SYNC_STATUS\":{\"$eq\":\"Vinhomes\"}}]},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
+                string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"$and\":[{\"SYNC_STATUS\":{\"$eq\":0}}]}}";
                 SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
-                var c = await _serviceBaseNeo4j.SearchNode(searchParam);
+                var c = await _serviceBaseNeo4j.SearchNode(null);
                 var a = 1;
                 //Utils utils = new();
                 //var b = utils.Parse(json);
@@ -168,7 +169,8 @@ namespace Shared.AppTest
 
 
                 //OpenAI
-                //var rs = await _tradeCommandParser.ParseAsync("LONG LIMIT TAO Entry: 312.8 SL: 304.6 (≤ 2.62%) Risk: 2.0% ");
+                //var rs = await _tradeCommandParser.ParseAsync("LONG BASED Entry: 0.1923 SL: 0.1805 (≤ 6.14%) Risk: 0.5% TPs: ✓ 0.2144 (50%) R/R: 4.17R");
+                //var a = 1;
                 //trade parser
                 //string imgBase64 = ImageToBase64(Path.Combine(Environment.CurrentDirectory,"imgs","image.png"));
                 //var rs = await _tradeCommandParser.ParseImageAsync(imgBase64);

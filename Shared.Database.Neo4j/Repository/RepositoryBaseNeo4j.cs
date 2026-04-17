@@ -51,7 +51,7 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
     {
         CypherQuery cypher = _cypherBuilder.BuildDynamicCypher(searchParam);
         if (cypher == null) return null;
-        var records = await _dataAccess.WriteAsync(cypher.Query, cypher.Params);
+        var records = await _dataAccess.ReadMultipleNodeAsync(cypher.Query, cypher.Params);
         Utils utils = new();
         var results = utils.ParserRecords(records);
         return results;
