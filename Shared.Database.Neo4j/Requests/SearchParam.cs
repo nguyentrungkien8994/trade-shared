@@ -2,19 +2,19 @@
 {
     public class SearchParam
     {
-        public string Node { get; set; }
-        public object Filter { get; set; }
-        public List<RelationDsl> Relations { get; set; }
-        public Target Target { get; set; }
+        public string? Node { get; set; }
+        public object? Filter { get; set; }
+        public List<RelationDsl>? Relations { get; set; }
+        public Target? Target { get; set; }
         
     }
     public class RelationDsl
     {
-        public string Type { get; set; }
-        public string Direction { get; set; } // out | in | both
-        public string Target { get; set; }
-        public DepthDsl Depth { get; set; }
-        public object Filter { get; set; }
+        public string? Type { get; set; }
+        public string? Direction { get; set; } // out | in | both
+        public string? Target { get; set; }
+        public DepthDsl? Depth { get; set; }
+        public object? Filter { get; set; }
     }
 
     public class DepthDsl
@@ -30,7 +30,7 @@
     }
     public class Target
     {
-        public string Node {  set; get; }
-        public object Filter { get; set; }
+        public string? Node {  set; get; }
+        public object? Filter { get; set; }
     }
 }
