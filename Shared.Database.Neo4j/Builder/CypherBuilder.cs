@@ -87,16 +87,18 @@ public class CypherBuilder : ICypherBuilder
             foreach (var op in obj.Properties())
             {
                 var param = NewParam(op.Value);
-
+                string queryField = $"{alias}.{field}";
+                if (field.Equals("@elementId", StringComparison.OrdinalIgnoreCase))
+                    queryField = $"elementId({alias})";
                 parts.Add(op.Name switch
                 {
-                    "$eq" => $"{alias}.{field} = ${param}",
-                    "$neq" => $"{alias}.{field} <> ${param}",
-                    "$gt" => $"{alias}.{field} > ${param}",
-                    "$gte" => $"{alias}.{field} >= ${param}",
-                    "$lt" => $"{alias}.{field} < ${param}",
-                    "$lte" => $"{alias}.{field} <= ${param}",
-                    "$in" => $"{alias}.{field} IN ${param}",
+                    "$eq" => $"{queryField} = ${param}",
+                    "$neq" => $"{queryField} <> ${param}",
+                    "$gt" => $"{queryField} > ${param}",
+                    "$gte" => $"{queryField} >= ${param}",
+                    "$lt" => $"{queryField} < ${param}",
+                    "$lte" => $"{queryField} <= ${param}",
+                    "$in" => $"{queryField} IN ${param}",
                     _ => throw new NotSupportedException(op.Name)
                 });
             }
