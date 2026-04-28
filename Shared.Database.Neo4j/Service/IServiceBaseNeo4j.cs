@@ -14,7 +14,8 @@ namespace Shared.Database.Neo4j.Service
     {
         Task<int> UpSertNodeAsync(IEnumerable<IDictionary<string,object>> nodes,string nodeName, string idKey = "id");
         Task<int> UpSertRelationshipAsync(IEnumerable<Relationship> rels, string fromKey = "id", string toKey = "id");
-        Task<object?> SearchNode(SearchParam searchParam);
+        Task<object?> SearchNodeAsync(SearchParam searchParam);
+        Task<object?> SearchNodeByCypherRawAsync(string cypher);
     }
     public interface IServiceBaseNeo4j<T, TId, IRepo> where T : IEntityKey<TId> where IRepo : IRepositoryBaseNeo4j<T, TId>
     {

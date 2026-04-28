@@ -36,9 +36,14 @@ public class ServiceBaseNeo4j : IServiceBaseNeo4j
     {
         return _repositoryBase.UpSertRelationshipAsync(rels, fromKey, toKey);
     }
-    public virtual Task<object?> SearchNode(SearchParam searchParam)
+    public virtual Task<object?> SearchNodeAsync(SearchParam searchParam)
     {
         return _repositoryBase.SearchNodeAsync(searchParam);
+    }
+
+    public Task<object?> SearchNodeByCypherRawAsync(string cypher)
+    {
+        return _repositoryBase.SearchNodeByCypherRawAsync(cypher);
     }
 }
 public class ServiceBaseNeo4j<T, TId, IRepo> : IRepositoryBaseNeo4j<T, TId> where IRepo : IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>
