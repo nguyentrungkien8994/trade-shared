@@ -38,7 +38,7 @@ public class ServiceBaseNeo4j : IServiceBaseNeo4j
     }
     public virtual Task<object?> SearchNode(SearchParam searchParam)
     {
-        return _repositoryBase.SearchNode(searchParam);
+        return _repositoryBase.SearchNodeAsync(searchParam);
     }
 }
 public class ServiceBaseNeo4j<T, TId, IRepo> : IRepositoryBaseNeo4j<T, TId> where IRepo : IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>

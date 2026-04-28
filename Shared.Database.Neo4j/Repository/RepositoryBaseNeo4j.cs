@@ -47,11 +47,20 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
         var summary = await _dataAccess.WriteScalarAsync(cypher, parameters);
         return summary.Counters.RelationshipsCreated;
     }
-    public virtual async Task<object?> SearchNode(SearchParam searchParam)
+    public virtual async Task<object?> SearchNodeAsync(SearchParam searchParam)
     {
         CypherQuery cypher = _cypherBuilder.BuildDynamicCypher(searchParam);
         if (cypher == null) return null;
         var records = await _dataAccess.ReadMultipleNodeAsync(cypher.Query, cypher.Params);
+        Utils utils = new();
+        var results = utils.ParserRecords(records);
+        return results;
+    }
+
+    public async Task<object?> SearchNodeByCypherRawAsync(string cypher)
+    {
+        if (string.IsNullOrWhiteSpace(cypher)) return null;
+        var records = await _dataAccess.ReadMultipleNodeAsync(cypher, null);
         Utils utils = new();
         var results = utils.ParserRecords(records);
         return results;

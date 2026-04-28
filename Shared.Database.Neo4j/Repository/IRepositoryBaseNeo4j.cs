@@ -8,7 +8,8 @@ public interface IRepositoryBaseNeo4j : IRepositoryBase
 {
     Task<int> UpSertNodeAsync(IEnumerable<IDictionary<string,object>> nodes, string nodeName, string idKey = "id");
     Task<int> UpSertRelationshipAsync(IEnumerable<Relationship> rels, string fromKey = "id", string toKey = "id");
-    Task<object?> SearchNode(SearchParam searchParam);
+    Task<object?> SearchNodeAsync(SearchParam searchParam);
+    Task<object?> SearchNodeByCypherRawAsync(string cypher);
 }
 public interface IRepositoryBaseNeo4j<T, TId>
 {
