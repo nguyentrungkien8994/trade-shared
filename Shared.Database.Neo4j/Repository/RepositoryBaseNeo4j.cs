@@ -53,16 +53,16 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
         if (cypher == null) return null;
         var records = await _dataAccess.ReadMultipleNodeAsync(cypher.Query, cypher.Params);
         Utils utils = new();
-        var results = utils.ParserRecords(records);
+        var results = utils.ParserRecords<object>(records);
         return results;
     }
 
-    public async Task<object?> SearchNodeByCypherRawAsync(string cypher)
+    public async Task<object?> SearchNodeByCypherRawAsync<T>(string cypher)
     {
         if (string.IsNullOrWhiteSpace(cypher)) return null;
         var records = await _dataAccess.ReadMultipleNodeAsync(cypher, null);
         Utils utils = new();
-        var results = utils.ParserRecords(records);
+        var results = utils.ParserRecords<T>(records);
         return results;
     }
 }

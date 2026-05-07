@@ -6,11 +6,13 @@ using Newtonsoft.Json;
 using Shared.AppTest.Entities;
 using Shared.AppTest.Entities.Oracle;
 using Shared.Database.Neo4j.Requests;
+using Shared.Database.Neo4j.Responses;
 using Shared.Database.Neo4j.Service;
 using Shared.Database.Oracle.Service;
 using Shared.OpenAI;
 using Shared.Redis;
 using Shared.Telegram;
+using System.Text.Json;
 
 namespace Shared.AppTest
 {
@@ -65,10 +67,241 @@ namespace Shared.AppTest
             byte[] imageBytes = File.ReadAllBytes(filePath);
             return Convert.ToBase64String(imageBytes);
         }
+
+        private const int PersonCount = 1_000_000;
+        private const int TransactionCount = 2_000_000;
+        private const int BatchSize = 5000;
+        // =========================
+        // 1. PERSON
+        // =========================
+        private async Task CreatePersons()
+        {
+            try
+            {
+                for (int i = 0; i < PersonCount; i += BatchSize)
+                {
+                    var batch = Enumerable.Range(i, BatchSize)
+                        .Select(x => new Dictionary<string, object>()
+                        {
+                        {"Mst",GenerateMst(x) },
+                        { "Name", GenerateName(x) }
+                        });
+
+                    int effects = await _serviceBaseNeo4j.UpSertNodeAsync(batch, "Person", "Mst");
+
+                    Console.WriteLine($"Inserted Persons: {effects}");
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+        // =========================
+        // 2. TRANSACTION 
+        // =========================
+        private async Task CreateTransactions()
+        {
+            var rand = new Random();
+
+            for (int i = 0; i < TransactionCount; i += BatchSize)
+            {
+                var batch = Enumerable.Range(i, BatchSize)
+                         .Select(x => new Dictionary<string, object>()
+                         {
+                            {"Id", $"TX-{Guid.NewGuid().ToString("N")}" },
+                            {"Amount", rand.Next(1000, 1_000_000) },
+                            {"TransactionDate", DateTime.UtcNow.AddDays(- rand.Next(0, 1000)).AddHours(- rand.Next(0,24)).AddMinutes(-rand.Next(0,60))}
+                         });
+
+                int effects = await _serviceBaseNeo4j.UpSertNodeAsync(batch, "Transaction", "Id");
+                Console.WriteLine($"Inserted Persons: {effects}");
+            }
+        }
+
+        public IEnumerable<Shared.Database.Neo4j.Requests.Relationship> GenerateRelationships(
+    List<string> personMsts,
+    List<string> transactionIds)
+        {
+            if (transactionIds.Count < personMsts.Count)
+                throw new Exception("Transaction phải >= Person để đảm bảo mỗi person có ít nhất 1 transaction");
+
+            var rand = new Random();
+
+            // =========================
+            // Phase 1: đảm bảo mỗi person có >= 1 transaction
+            // =========================
+            for (int i = 0; i < personMsts.Count; i++)
+            {
+                var from = personMsts[i];
+                var to = personMsts[rand.Next(personMsts.Count)];
+                var tx = transactionIds[i];
+
+                foreach (var rel in BuildTriplet(from, to, tx))
+                    yield return rel;
+            }
+
+            // =========================
+            // Phase 2: phần còn lại
+            // =========================
+            for (int i = personMsts.Count; i < transactionIds.Count; i++)
+            {
+                var from = personMsts[rand.Next(personMsts.Count)];
+                var to = personMsts[rand.Next(personMsts.Count)];
+                var tx = transactionIds[i];
+
+                foreach (var rel in BuildTriplet(from, to, tx))
+                    yield return rel;
+            }
+        }
+
+        private IEnumerable<Shared.Database.Neo4j.Requests.Relationship> BuildTriplet(
+    string fromMst,
+    string toMst,
+    string txId)
+        {
+            // 1. HAS
+            yield return new Shared.Database.Neo4j.Requests.Relationship
+            {
+                FromNode = "Person",
+                FromId = fromMst,
+                ToNode = "Transaction",
+                ToId = txId,
+                RelationName = "HAS"
+            };
+
+            // 2. TO
+            yield return new Shared.Database.Neo4j.Requests.Relationship
+            {
+                FromNode = "Transaction",
+                FromId = txId,
+                ToNode = "Person",
+                ToId = toMst,
+                RelationName = "TO"
+            };
+
+            // 3. SELL (derived)
+            yield return new Shared.Database.Neo4j.Requests.Relationship
+            {
+                FromNode = "Person",
+                FromId = fromMst,
+                ToNode = "Person",
+                ToId = toMst,
+                RelationName = "SELL"
+            };
+        }
+
+        private int Hash(int x)
+        {
+            unchecked
+            {
+                x ^= (x << 13);
+                x ^= (x >> 17);
+                x ^= (x << 5);
+                return x;
+            }
+        }
+        private string GenerateMst(int seed)
+        {
+            // không tăng dần → hash
+            return $"MST-{Math.Abs(Hash(seed)) % 1_000_000_000:D9}";
+        }
+        readonly string[] LastNames = new[]
+{
+    "Nguyễn","Trần","Lê","Phạm","Hoàng","Huỳnh","Phan",
+    "Vũ","Võ","Đặng","Bùi","Đỗ","Hồ","Ngô","Dương","Lý"
+};
+        readonly string[] MiddleNames = new[]
+{
+    "Văn","Thị","Hữu","Đức","Ngọc","Quang","Thanh",
+    "Minh","Xuân","Hoàng","Gia","Anh","Bảo","Phúc"
+};
+        readonly string[] FirstNames = new[]
+{
+    "An","Bình","Cường","Dũng","Hạnh","Khánh","Long",
+    "Nam","Phúc","Quân","Sơn","Trang","Tuấn","Vy",
+    "Yến","Linh","Hải","Hiếu","Tâm","Thảo"
+};
+        private string GenerateName(int seed)
+        {
+            var rand = new Random(Hash(seed));
+
+            string lastName = WeightedLastName(rand);
+            string middleName = MiddleNames[rand.Next(MiddleNames.Length)];
+            string firstName = FirstNames[rand.Next(FirstNames.Length)];
+
+            // thêm 1 tên đệm phụ (tăng diversity)
+            if (rand.NextDouble() < 0.3)
+            {
+                string extra = MiddleNames[rand.Next(MiddleNames.Length)];
+                return $"{lastName} {middleName} {extra} {firstName}";
+            }
+
+            return $"{lastName} {middleName} {firstName}";
+        }
+        private string WeightedLastName(Random rand)
+        {
+            int r = rand.Next(100);
+
+            if (r < 30) return "Nguyễn";   // ~30%
+            if (r < 42) return "Trần";     // ~12%
+            if (r < 52) return "Lê";       // ~10%
+            if (r < 60) return "Phạm";
+            if (r < 68) return "Hoàng";
+            if (r < 75) return "Phan";
+            if (r < 82) return "Vũ";
+            if (r < 88) return "Đặng";
+            if (r < 94) return "Bùi";
+
+            return LastNames[rand.Next(LastNames.Length)];
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             try
             {
+
+                //await CreatePersons();
+                //await CreateTransactions();
+                var persons2 = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<object>("MATCH (a:Person {Mst: \"MST-658790018\"}),\r\n      (b:Person)\r\nMATCH p = shortestPath((a)-[:SELL*1..100]->(b))\r\nRETURN p LIMIT 100");
+                var persons = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<string>("Match(n:Person) return n.Mst");
+                var trans = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<string>("Match(n:Transaction) return n.Id");
+
+                List<string> listPerson = new();
+                List<string> listTrans = new();
+                //List<string> listPerson = persons.ToList();
+                //List<string> listTrans = trans.ToList();
+
+                var rels = GenerateRelationships(listPerson, listTrans);
+                var grouped = rels.GroupBy(x => new { x.FromNode, x.ToNode, x.RelationName }).ToList();
+                foreach (var group in grouped)
+                {
+                    int max = group.Count();
+                    string fKey = "";
+                    string tKey = "";
+                    var obj = group.FirstOrDefault();
+                    if (obj != null)
+                    {
+                        if (obj.FromNode.Equals("Person", StringComparison.OrdinalIgnoreCase))
+                            fKey = "Mst";
+                        else if (obj.FromNode.Equals("Transaction", StringComparison.OrdinalIgnoreCase))
+                            fKey = "Id";
+
+                        if (obj.ToNode.Equals("Person", StringComparison.OrdinalIgnoreCase))
+                            tKey = "Mst";
+                        else if (obj.ToNode.Equals("Transaction", StringComparison.OrdinalIgnoreCase))
+                            tKey = "Id";
+                    }
+                    for (int i = 0; i < max; i += BatchSize)
+                    {
+                        var chunks = group.Skip(i).Take(BatchSize);
+
+                        var effects = await _serviceBaseNeo4j.UpSertRelationshipAsync(chunks, fKey, tKey);
+                        Console.WriteLine($"Inserted Relationship: {effects}");
+                    }
+                }
+
                 //_logger.LogInformation("info");
                 //_logger.LogWarning("warning");
                 //_logger.LogError("error");
@@ -107,8 +340,8 @@ namespace Shared.AppTest
                 //await _serviceBaseNeo4j.GetAllAsync();
                 //await _serviceBaseNeo4j.DeleteAsync("acc43449-8b28-4609-9f7e-04be2cb2bbc8");
                 //string json = "{\"node\":\"Company\",\"filter\":{\"id\":{\"$gt\":2},\"Status\":\"ACTIVE\",\"$or\":[{\"Balance\":{\"$gte\":1000}},{\"Vip\":true}]}}";
-                //string json = "{\"node\":\"TaxPayer\",\"filter\":{\"taxCode\":{\"$eq\":\"A\"}},\"relations\":[{\"type\":\"HAS_BUCKET\",\"direction\":\"out\",\"target\":\"InvoiceBucket\",\"depth\":{\"min\":1,\"max\":3}},{\"type\":\"TO\",\"direction\":\"in\",\"target\":\"Invoice\"}]}";
-                //string json = "{\"node\":\"TaxPayer\",\"filter\":{\"taxCode\":{\"$eq\":\"A\"}}}";
+                //string json = "{\"node\":\"SYS_PERSON\",\"relations\":[{\"type\":\"HOLD\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"Node\":\"SYS_COMPANY\"}}";
+                //string json = "{\"node\":\"SYS_PERSON\"}";
                 //string json = "{\"node\":\"TaxPayer\",\"target\":{\"node\":\"InvoiceBucket\"}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
@@ -117,14 +350,20 @@ namespace Shared.AppTest
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"$and\":[{\"SYNC_STATUS\":{\"$eq\":0}}]}}";
                 //string json = "{\"node\":\"TaxPayer\",\"filter\":{\"taxCode\":{\"$eq\":\"C\"}},\"relations\":[{\"type\":\"HAS_BUCKET\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}]}";
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}},\"relations\":[{\"type\":\"\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}]}";
-                string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:1516\"}},\"relations\":[{\"type\":\"HOLD\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}}}}";
-                SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
-                var c = await _serviceBaseNeo4j.SearchNodeAsync(searchParam);
-                var a = 1;
+                //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:1516\"}},\"relations\":[{\"type\":\"HOLD\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}}}}";
+                //SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
+                //var c = await _serviceBaseNeo4j.SearchNode(searchParam);
+                //var a = 1;
                 //Utils utils = new();
                 //var b = utils.Parse(json);
                 //var c = await _serviceBaseNeo4j.SearchNode(new Database.Neo4j.Responses.CypherQuery() { Query = b.Query, Params = b.Params });
                 //var a = await _serviceNeo4j.GetAllObjectAsync("TaxPayer");
+                //var cypher = new CypherQuery()
+                //{
+                //    Query = "MATCH(n:SYS_PERSON) WHERE n.ID=\"242\" SET n.FULLNAME=\"Lê Quốc Bình 1\" RETURN n"
+                //};
+                //var a = await _serviceBaseNeo4j.SearchNodeByRawCypherAsync(cypher);
+                //var b = 1;
 
                 //Oracle
                 //var filters = new Dictionary<string, object>

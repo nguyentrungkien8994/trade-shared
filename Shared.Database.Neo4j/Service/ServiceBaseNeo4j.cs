@@ -41,9 +41,9 @@ public class ServiceBaseNeo4j : IServiceBaseNeo4j
         return _repositoryBase.SearchNodeAsync(searchParam);
     }
 
-    public Task<object?> SearchNodeByCypherRawAsync(string cypher)
+    public Task<object?> SearchNodeByCypherRawAsync<T>(string cypher)
     {
-        return _repositoryBase.SearchNodeByCypherRawAsync(cypher);
+        return _repositoryBase.SearchNodeByCypherRawAsync<T>(cypher);
     }
 }
 public class ServiceBaseNeo4j<T, TId, IRepo> : IRepositoryBaseNeo4j<T, TId> where IRepo : IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>

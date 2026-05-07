@@ -10,7 +10,7 @@ namespace Shared.Database.Neo4j
 {
     public class Utils
     {
-        public object ParserRecords(IEnumerable<IRecord> records)
+        public object ParserRecords<T>(IEnumerable<IRecord> records)
         {
             var nodes = new Dictionary<string, object>();
             var edges = new List<object>();
@@ -21,7 +21,7 @@ namespace Shared.Database.Neo4j
                 foreach (var key in record.Keys)
                 {
                     var value = record[key];
-                    Extract(value, nodes, edges, edgeSet);
+                    Extract<T>(value, nodes, edges, edgeSet);
                 }
             }
 
@@ -34,7 +34,7 @@ namespace Shared.Database.Neo4j
         // =========================
         // RECURSIVE EXTRACTOR
         // =========================
-        private void Extract(object value,
+        private void Extract<T>(object value,
             Dictionary<string, object> nodes,
             List<object> edges,
             HashSet<string> edgeSet)
@@ -85,16 +85,18 @@ namespace Shared.Database.Neo4j
                 return;
             }
 
+            
+
             // =========================
             // PATH
             // =========================
             if (value is IPath path)
             {
                 foreach (var n in path.Nodes)
-                    Extract(n, nodes, edges, edgeSet);
+                    Extract<T>(n, nodes, edges, edgeSet);
 
                 foreach (var r in path.Relationships)
-                    Extract(r, nodes, edges, edgeSet);
+                    Extract<T>(r, nodes, edges, edgeSet);
 
                 return;
             }
@@ -106,7 +108,7 @@ namespace Shared.Database.Neo4j
             {
                 foreach (var item in list)
                 {
-                    Extract(item, nodes, edges, edgeSet);
+                    Extract<T>(item, nodes, edges, edgeSet);
                 }
 
                 return;
@@ -119,11 +121,24 @@ namespace Shared.Database.Neo4j
             {
                 foreach (var v in dict.Values)
                 {
-                    Extract(v, nodes, edges, edgeSet);
+                    Extract<T>(v, nodes, edges, edgeSet);
                 }
 
                 return;
             }
+
+            //T type
+            //if (value is T)
+            //{
+            //    var id = Guid.NewGuid().ToString();
+
+            //    if (!nodes.ContainsKey(id))
+            //    {
+            //        nodes[id] = value;
+            //    }
+
+            //    return;
+            //}
         }
     }
 }
