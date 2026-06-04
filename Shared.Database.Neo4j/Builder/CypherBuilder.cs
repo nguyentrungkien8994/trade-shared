@@ -1,4 +1,4 @@
-﻿using KLib.Core.Database;
+using KLib.Core.Database;
 using Neo4j.Driver;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -191,7 +191,8 @@ public class CypherBuilder : ICypherBuilder
             }
         }
 
-        query.AppendLine("RETURN p");
+        var limit = dsl.Limit ?? 100;
+        query.AppendLine($"RETURN p LIMIT {limit}");
 
         return new CypherQuery
         {
@@ -229,14 +230,14 @@ public class CypherBuilder : ICypherBuilder
             parameters[name] = prop.GetValue(entity);
         }
         TrimComma(sb);
-        sb.Append(" }) RETURN n");
+        sb.Append(" }) RETURN n LIMIT 1");
 
         return (sb.ToString(), parameters);
     }
 
     public string BuildGetAll(string entityName)
     {
-        string cypher = $"MATCH(n:{entityName}) return n";
+        string cypher = $"MATCH(n:{entityName}) return n LIMIT 1000";
         return cypher;
     }
 
@@ -329,7 +330,7 @@ public class CypherBuilder : ICypherBuilder
             parameters[prop.Name] = prop.GetValue(entity);
         }
         TrimComma(sb);
-        sb.Append(" RETURN n");
+        sb.Append(" RETURN n LIMIT 1");
 
         return (sb.ToString(), parameters);
     }
@@ -342,6 +343,8 @@ public class CypherBuilder : ICypherBuilder
             { keyName,id }
         };
         string cypher = $"MATCH(n:{typeof(T).Name}{{{keyName}:\"{id}\"}}) Delete n";
+        // Cypher doesn't support LIMIT with DELETE in this way directly without WITH, but since it's by ID it's fine.
+        // If the user wants LIMIT everywhere, we can add it but it might be redundant for single ID delete.
         return (cypher, parameters);
     }
 
@@ -352,7 +355,7 @@ public class CypherBuilder : ICypherBuilder
         {
             { keyName,id }
         };
-        string cypher = $"MATCH(n:{typeof(T).Name}{{{keyName}:\"{id}\"}}) return n";
+        string cypher = $"MATCH(n:{typeof(T).Name}{{{keyName}:\"{id}\"}}) return n LIMIT 1";
         return (cypher, parameters);
     }
 
@@ -427,6 +430,9 @@ public class CypherBuilder : ICypherBuilder
         {
             query.AppendLine("WHERE " + string.Join(" AND ", whereParts));
         }
+
+        var limit = dsl.Limit ?? _options.DefaultLimit;
+        query.AppendLine($"WITH n LIMIT {limit}");
 
         // =========================
         // CASE 1: NO RELATION

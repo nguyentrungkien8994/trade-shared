@@ -18,6 +18,7 @@
     <ProjectReference Include="..\Shared.Database.Oracle\Shared.Database.Oracle.csproj" />
     <ProjectReference Include="..\Shared.Kafka\Shared.Kafka.csproj" />
     <ProjectReference Include="..\Shared.Logger.Serilog\Shared.Logger.Serilog.csproj" />
+    <ProjectReference Include="..\Shared.MongoDB\Shared.MongoDB.csproj" />
     <ProjectReference Include="..\Shared.OpenAI\Shared.OpenAI.csproj" />
     <ProjectReference Include="..\Shared.Redis\Shared.Redis.csproj" />
     <ProjectReference Include="..\Shared.Telegram\Shared.Telegram.csproj" />

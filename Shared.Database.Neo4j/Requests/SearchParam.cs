@@ -1,4 +1,4 @@
-﻿namespace Shared.Database.Neo4j.Requests
+namespace Shared.Database.Neo4j.Requests
 {
     public class SearchParam
     {
@@ -6,7 +6,7 @@
         public object? Filter { get; set; }
         public List<RelationDsl>? Relations { get; set; }
         public Target? Target { get; set; }
-        
+        public int? Limit { get; set; }
     }
     public class RelationDsl
     {
@@ -27,6 +27,7 @@
         public int DefaultMinDepth { get; set; } = 1;
         public int DefaultMaxDepth { get; set; } = 10;
         public int HardMaxDepth { get; set; } = 100; // chống abuse
+        public int DefaultLimit { get; set; } = 1000;
     }
     public class Target
     {

@@ -4,8 +4,13 @@ using Shared.MongoDB.Dto;
 using Shared.MongoDB.Entity;
 using Shared.MongoDB.Repository;
 
-namespace SIGNAL.STORAGE.SERVICE;
+namespace Shared.MongoDB;
 
+public interface IServiceBase
+{
+    Task<int> InsertObjectAsync(string objectName, object entity);
+    Task<int> InsertRangeObjectsAsyncs(string objectName, object[] entities);
+}
 public interface IServiceBase<T> where T : EntityBase
 {
     IRepositoryBase<T> Repository { get; }

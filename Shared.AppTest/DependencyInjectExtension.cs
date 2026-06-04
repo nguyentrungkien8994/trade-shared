@@ -1,7 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 using Shared.Kafka;
+using Shared.MongoDB;
+using Shared.MongoDB.Repository;
 using Shared.OpenAI;
 
 namespace Shared.AppTest
@@ -43,27 +46,29 @@ namespace Shared.AppTest
             services.AddSingleton<ITradeCommandParser, OpenAiTradeCommandParser>();
         }
 
-        ///// <summary>
-        ///// add mongodb connection
-        ///// </summary>
-        ///// <param name="services"></param>
-        //public static void AddMongoDB(this IServiceCollection services,string uri,string database)
-        //{
-        //    // Kafka options
-        //    services.AddSingleton<IOptions<MongoSettings>>(
-        //        Options.Create(new MongoSettings
-        //        {
-        //            ConnectionString = uri,
-        //            Database= database
-        //        })
-        //    );
-        //    services.AddSingleton<IMongoClient>(sp =>
-        //    {
-        //        var settings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
-        //        return new MongoClient(settings.ConnectionString);
-        //    });
-        //    services.AddSingleton<MongoDBContext>();
-        //}
+        /// <summary>
+        /// add mongodb connection
+        /// </summary>
+        /// <param name="services"></param>
+        public static void AddMongoDB(this IServiceCollection services, string uri, string database)
+        {
+            // Kafka options
+            services.AddSingleton<IOptions<MongoSettings>>(
+                Options.Create(new MongoSettings
+                {
+                    ConnectionString = uri,
+                    Database = database
+                })
+            );
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var settings = sp.GetRequiredService<IOptions<MongoSettings>>().Value;
+                return new MongoClient(settings.ConnectionString);
+            });
+            services.AddSingleton<MongoDBContext>();
+            services.AddScoped(typeof(IRepositoryBase), typeof(RepositoryBase));
+            services.AddScoped(typeof(IServiceBase), typeof(ServiceBase));
+        }
 
         ///// <summary>
         ///// add nlog

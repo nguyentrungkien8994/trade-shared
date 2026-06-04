@@ -6,6 +6,30 @@ using System.Linq.Expressions;
 
 namespace Shared.MongoDB.Repository;
 
+public class RepositoryBase : IRepositoryBase
+{
+    MongoDBContext _dbContext;
+    public RepositoryBase(MongoDBContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+    public async Task<int> InsertObjectAsync(string objectName ,object entity)
+    {
+        var collection = _dbContext.GetCollection<BsonDocument>(objectName);
+        BsonDocument document = entity switch
+        {
+            BsonDocument bson => bson,
+            _ => entity.ToBsonDocument()
+        };
+        await collection.InsertOneAsync(document);
+        return 1;
+    }
+
+    public Task<int> InsertRangeObjectsAsyncs(string objectName, object[] entities)
+    {
+        throw new NotImplementedException();
+    }
+}
 public class RepositoryBase<T> : IRepositoryBase<T> where T : EntityBase, new()
 {
     private readonly IMongoCollection<T> _collection;

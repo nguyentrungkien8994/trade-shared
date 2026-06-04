@@ -1,11 +1,28 @@
-﻿using System.Linq.Expressions;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using Shared.MongoDB.Dto;
 using Shared.MongoDB.Entity;
 using Shared.MongoDB.Repository;
+using System.Linq.Expressions;
 
-namespace SIGNAL.STORAGE.SERVICE
+namespace Shared.MongoDB
 {
+    public class ServiceBase : IServiceBase
+    {
+        private readonly IRepositoryBase _repository;
+        public ServiceBase(IRepositoryBase repository)
+        {
+            _repository = repository;
+        }
+        public Task<int> InsertObjectAsync(string objectName, object entity)
+        {
+            return _repository.InsertObjectAsync(objectName, entity);
+        }
+
+        public Task<int> InsertRangeObjectsAsyncs(string objectName, object[] entities)
+        {
+            return _repository.InsertRangeObjectsAsyncs(objectName, entities);
+        }
+    }
     public class ServiceBase<T, IRepo> : IServiceBase<T> where T : EntityBase where IRepo : IRepositoryBase<T>
     {
         IRepo _repositoryBase;
@@ -51,13 +68,13 @@ namespace SIGNAL.STORAGE.SERVICE
         public virtual async Task<int> InsertRange(T[] entities)
         {
             //foreach (T entity in entities)
-                //SetTrackingSystemField(entity);
+            //SetTrackingSystemField(entity);
             return await _repositoryBase.InsertRange(entities);
         }
 
         public virtual async Task<int> Update(T entity)
         {
-            IEntityBase? obj = await _repositoryBase.SearchOne(x=>x.id==entity.id);
+            IEntityBase? obj = await _repositoryBase.SearchOne(x => x.id == entity.id);
             if (obj == null) throw new Exception("Entity not found");
             entity.created_at = entity.created_at;
             entity.created_by = entity.created_by;

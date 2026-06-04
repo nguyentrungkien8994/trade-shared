@@ -18,6 +18,7 @@ namespace Shared.AppTest
 {
     public sealed class KafkaConsumerWorker : BackgroundService
     {
+        private readonly Shared.MongoDB.IServiceBase _mongoDBserviceBase;
         private readonly IServiceBaseOracle _oracleService;
         private readonly IServiceBaseOracle<Company, int> _oracleServiceCompany;
         //private readonly IServiceBase<Customer, ObjectId, IRepositoryBase<Customer, ObjectId>> _serviceBase;
@@ -41,7 +42,8 @@ namespace Shared.AppTest
             IServiceBaseOracle oracleService,
         //IKafkaConsumer kafkaConsumer,
         ITradeCommandParser tradeCommandParser,
-            IRedisStreamService redisStreamService
+            IRedisStreamService redisStreamService,
+            Shared.MongoDB.IServiceBase mongoDBserviceBase
             //IOptions<KafkaOptions> options,
             //IServiceProvider provider,
             //IKafkaProducer kafkaProducer
@@ -57,6 +59,7 @@ namespace Shared.AppTest
             _serviceBaseNeo4j = serviceBaseNeo4j;
             _oracleService = oracleService;
             _redisStreamService = redisStreamService;
+            _mongoDBserviceBase = mongoDBserviceBase;
 
         }
         private string ImageToBase64(string filePath)
@@ -261,46 +264,49 @@ namespace Shared.AppTest
         {
             try
             {
+                //mongodb
+                await _mongoDBserviceBase.InsertObjectAsync("kai",new {name="Kai", age = 13});
+
 
                 //await CreatePersons();
                 //await CreateTransactions();
-                var persons2 = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<object>("MATCH (a:Person {Mst: \"MST-658790018\"}),\r\n      (b:Person)\r\nMATCH p = shortestPath((a)-[:SELL*1..100]->(b))\r\nRETURN p LIMIT 100");
-                var persons = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<string>("Match(n:Person) return n.Mst");
-                var trans = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<string>("Match(n:Transaction) return n.Id");
+                // var persons2 = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<object>("MATCH (a:Person {Mst: \"MST-658790018\"}),\r\n      (b:Person)\r\nMATCH p = shortestPath((a)-[:SELL*1..100]->(b))\r\nRETURN p LIMIT 100");
+                // var persons = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<string>("Match(n:Person) return n.Mst");
+                // var trans = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<string>("Match(n:Transaction) return n.Id");
 
-                List<string> listPerson = new();
-                List<string> listTrans = new();
-                //List<string> listPerson = persons.ToList();
-                //List<string> listTrans = trans.ToList();
+                // List<string> listPerson = new();
+                // List<string> listTrans = new();
+                // //List<string> listPerson = persons.ToList();
+                // //List<string> listTrans = trans.ToList();
 
-                var rels = GenerateRelationships(listPerson, listTrans);
-                var grouped = rels.GroupBy(x => new { x.FromNode, x.ToNode, x.RelationName }).ToList();
-                foreach (var group in grouped)
-                {
-                    int max = group.Count();
-                    string fKey = "";
-                    string tKey = "";
-                    var obj = group.FirstOrDefault();
-                    if (obj != null)
-                    {
-                        if (obj.FromNode.Equals("Person", StringComparison.OrdinalIgnoreCase))
-                            fKey = "Mst";
-                        else if (obj.FromNode.Equals("Transaction", StringComparison.OrdinalIgnoreCase))
-                            fKey = "Id";
+                // var rels = GenerateRelationships(listPerson, listTrans);
+                // var grouped = rels.GroupBy(x => new { x.FromNode, x.ToNode, x.RelationName }).ToList();
+                // foreach (var group in grouped)
+                // {
+                //     int max = group.Count();
+                //     string fKey = "";
+                //     string tKey = "";
+                //     var obj = group.FirstOrDefault();
+                //     if (obj != null)
+                //     {
+                //         if (obj.FromNode.Equals("Person", StringComparison.OrdinalIgnoreCase))
+                //             fKey = "Mst";
+                //         else if (obj.FromNode.Equals("Transaction", StringComparison.OrdinalIgnoreCase))
+                //             fKey = "Id";
 
-                        if (obj.ToNode.Equals("Person", StringComparison.OrdinalIgnoreCase))
-                            tKey = "Mst";
-                        else if (obj.ToNode.Equals("Transaction", StringComparison.OrdinalIgnoreCase))
-                            tKey = "Id";
-                    }
-                    for (int i = 0; i < max; i += BatchSize)
-                    {
-                        var chunks = group.Skip(i).Take(BatchSize);
+                //         if (obj.ToNode.Equals("Person", StringComparison.OrdinalIgnoreCase))
+                //             tKey = "Mst";
+                //         else if (obj.ToNode.Equals("Transaction", StringComparison.OrdinalIgnoreCase))
+                //             tKey = "Id";
+                //     }
+                //     for (int i = 0; i < max; i += BatchSize)
+                //     {
+                //         var chunks = group.Skip(i).Take(BatchSize);
 
-                        var effects = await _serviceBaseNeo4j.UpSertRelationshipAsync(chunks, fKey, tKey);
-                        Console.WriteLine($"Inserted Relationship: {effects}");
-                    }
-                }
+                //         var effects = await _serviceBaseNeo4j.UpSertRelationshipAsync(chunks, fKey, tKey);
+                //         Console.WriteLine($"Inserted Relationship: {effects}");
+                //     }
+                // }
 
                 //_logger.LogInformation("info");
                 //_logger.LogWarning("warning");
@@ -340,8 +346,9 @@ namespace Shared.AppTest
                 //await _serviceBaseNeo4j.GetAllAsync();
                 //await _serviceBaseNeo4j.DeleteAsync("acc43449-8b28-4609-9f7e-04be2cb2bbc8");
                 //string json = "{\"node\":\"Company\",\"filter\":{\"id\":{\"$gt\":2},\"Status\":\"ACTIVE\",\"$or\":[{\"Balance\":{\"$gte\":1000}},{\"Vip\":true}]}}";
-                //string json = "{\"node\":\"SYS_PERSON\",\"relations\":[{\"type\":\"HOLD\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"Node\":\"SYS_COMPANY\"}}";
-                //string json = "{\"node\":\"SYS_PERSON\"}";
+                //string json = "{\"node\":\"Person\",\"relations\":[{\"type\":\"SELL\"}]}";
+                //string json = "{\"node\":\"Person\",\"relations\":[{\"type\":\"SELL\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"Node\":\"Person\"}}";
+                //string json = "{\"node\":\"Person\"}";
                 //string json = "{\"node\":\"TaxPayer\",\"target\":{\"node\":\"InvoiceBucket\"}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
@@ -352,7 +359,7 @@ namespace Shared.AppTest
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}},\"relations\":[{\"type\":\"\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}]}";
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:1516\"}},\"relations\":[{\"type\":\"HOLD\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}}}}";
                 //SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
-                //var c = await _serviceBaseNeo4j.SearchNode(searchParam);
+                //var c = await _serviceBaseNeo4j.SearchNodeAsync(searchParam);
                 //var a = 1;
                 //Utils utils = new();
                 //var b = utils.Parse(json);

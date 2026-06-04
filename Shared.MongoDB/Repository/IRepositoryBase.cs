@@ -5,6 +5,12 @@ using Shared.MongoDB.Entity;
 using System.Linq.Expressions;
 
 namespace Shared.MongoDB.Repository;
+
+public interface IRepositoryBase
+{
+    Task<int> InsertObjectAsync(string objectName, object entity);
+    Task<int> InsertRangeObjectsAsyncs(string objectName, object[] entities);
+}
 public interface IRepositoryBase<T> where T : EntityBase
 {
     IMongoCollection<T> MongoCollectionDB{ get; }
