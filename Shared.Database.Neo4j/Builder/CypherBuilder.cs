@@ -16,6 +16,7 @@ public class CypherBuilder : ICypherBuilder
     private readonly Dictionary<string, object> _params = new();
 
     
+    private const int MaxDynamicQueryLimit = 500;
 
     private string BuildDepth(RelationDsl rel, GraphQueryOptions options)
     {
@@ -135,6 +136,15 @@ public class CypherBuilder : ICypherBuilder
         };
     }
 
+    private static int NormalizeDynamicQueryLimit(int? requestedLimit, int defaultLimit)
+    {
+        var effectiveLimit = requestedLimit.GetValueOrDefault(defaultLimit);
+        if (effectiveLimit <= 0)
+            effectiveLimit = defaultLimit;
+
+        return Math.Min(effectiveLimit, MaxDynamicQueryLimit);
+    }
+
     private CypherQuery BuildRelationBetweenNodes(SearchParam dsl)
     {
         var query = new StringBuilder();
@@ -191,7 +201,7 @@ public class CypherBuilder : ICypherBuilder
             }
         }
 
-        var limit = dsl.Limit ?? 100;
+        var limit = NormalizeDynamicQueryLimit(dsl.Limit, 100);
         query.AppendLine($"RETURN p LIMIT {limit}");
 
         return new CypherQuery
@@ -431,7 +441,7 @@ public class CypherBuilder : ICypherBuilder
             query.AppendLine("WHERE " + string.Join(" AND ", whereParts));
         }
 
-        var limit = dsl.Limit ?? _options.DefaultLimit;
+        var limit = NormalizeDynamicQueryLimit(dsl.Limit, _options.DefaultLimit);
         query.AppendLine($"WITH n LIMIT {limit}");
 
         // =========================

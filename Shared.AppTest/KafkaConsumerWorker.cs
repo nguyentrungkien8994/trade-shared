@@ -265,7 +265,10 @@ namespace Shared.AppTest
             try
             {
                 //mongodb
-                await _mongoDBserviceBase.InsertObjectAsync("kai",new {name="Kai", age = 13});
+                //await _mongoDBserviceBase.InsertObjectAsync("kai",new {name="Kai", age = 13});
+
+                //var data = BsonDocument.Parse(JsonConvert.SerializeObject(new { name = "Kai", age = 15 }));
+                //await _mongoDBserviceBase.InsertObjectAsync("kai", data);
 
 
                 //await CreatePersons();
@@ -346,20 +349,20 @@ namespace Shared.AppTest
                 //await _serviceBaseNeo4j.GetAllAsync();
                 //await _serviceBaseNeo4j.DeleteAsync("acc43449-8b28-4609-9f7e-04be2cb2bbc8");
                 //string json = "{\"node\":\"Company\",\"filter\":{\"id\":{\"$gt\":2},\"Status\":\"ACTIVE\",\"$or\":[{\"Balance\":{\"$gte\":1000}},{\"Vip\":true}]}}";
-                //string json = "{\"node\":\"Person\",\"relations\":[{\"type\":\"SELL\"}]}";
+                string json = "{\"node\":\"Person\",\"relations\":[{\"type\":\"SELL\"}]}";
                 //string json = "{\"node\":\"Person\",\"relations\":[{\"type\":\"SELL\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"Node\":\"Person\"}}";
                 //string json = "{\"node\":\"Person\"}";
                 //string json = "{\"node\":\"TaxPayer\",\"target\":{\"node\":\"InvoiceBucket\"}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$or\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gt\":3}},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
                 //string json = "{\"node\":\"Company\",\"filter\":{\"$and\":[{\"id\":{\"$gte\":2}},{\"code\":{\"$neq\":\"Vinhomes\"}}]}}";
-                //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"$or\":[{\"$and\":[{\"id\":{\"$gte\":2}},{\"SYNC_STATUS\":{\"$eq\":\"Vinhomes\"}}]},{\"code\":{\"$eq\":\"Vinhomes\"}}]}}";
+                //string json = "{\"node\":\"SYS_PERSON\"}";
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"$and\":[{\"SYNC_STATUS\":{\"$eq\":0}}]}}";
                 //string json = "{\"node\":\"TaxPayer\",\"filter\":{\"taxCode\":{\"$eq\":\"C\"}},\"relations\":[{\"type\":\"HAS_BUCKET\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}]}";
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}},\"relations\":[{\"type\":\"\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}]}";
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:1516\"}},\"relations\":[{\"type\":\"HOLD\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}}}}";
-                //SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
-                //var c = await _serviceBaseNeo4j.SearchNodeAsync(searchParam);
+                SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
+                var c = await _serviceBaseNeo4j.SearchNodeAsync(searchParam);
                 //var a = 1;
                 //Utils utils = new();
                 //var b = utils.Parse(json);

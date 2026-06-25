@@ -25,7 +25,7 @@ namespace Shared.Database.Neo4j.Requests
     public class GraphQueryOptions
     {
         public int DefaultMinDepth { get; set; } = 1;
-        public int DefaultMaxDepth { get; set; } = 10;
+        public int DefaultMaxDepth { get; set; } = 1;
         public int HardMaxDepth { get; set; } = 100; // chống abuse
         public int DefaultLimit { get; set; } = 1000;
     }
