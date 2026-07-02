@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Shared.Database.Neo4j.Requests;
 using Shared.Database.Neo4j.Responses;
+using System.Dynamic;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -10,6 +11,25 @@ namespace Shared.Database.Neo4j
 {
     public class Utils
     {
+        public List<dynamic> ParserDynamicRecords(IEnumerable<IRecord> records)
+        {
+            var results = new List<dynamic>();
+
+            foreach (var record in records)
+            {
+                IDictionary<string, object?> row = new ExpandoObject();
+
+                foreach (var key in record.Keys)
+                {
+                    row[key] = ConvertDynamicValue(record[key]);
+                }
+
+                results.Add((ExpandoObject)row);
+            }
+
+            return results;
+        }
+
         public object ParserRecords<T>(IEnumerable<IRecord> records)
         {
             var nodes = new Dictionary<string, object>();
@@ -128,17 +148,65 @@ namespace Shared.Database.Neo4j
             }
 
             //T type
-            //if (value is T)
-            //{
-            //    var id = Guid.NewGuid().ToString();
+            if (value is T)
+            {
+                var id = Guid.NewGuid().ToString();
 
-            //    if (!nodes.ContainsKey(id))
-            //    {
-            //        nodes[id] = value;
-            //    }
+                if (!nodes.ContainsKey(id))
+                {
+                    nodes[id] = value;
+                }
 
-            //    return;
-            //}
+                return;
+            }
+        }
+
+        private object? ConvertDynamicValue(object? value)
+        {
+            if (value == null) return null;
+
+            if (value is INode node)
+            {
+                return new
+                {
+                    id = node.ElementId.ToString(),
+                    labels = node.Labels.ToList(),
+                    properties = node.Properties.ToDictionary(x => x.Key, x => ConvertDynamicValue(x.Value))
+                };
+            }
+
+            if (value is IRelationship relationship)
+            {
+                return new
+                {
+                    id = relationship.ElementId.ToString(),
+                    type = relationship.Type,
+                    from = relationship.StartNodeElementId.ToString(),
+                    to = relationship.EndNodeElementId.ToString(),
+                    properties = relationship.Properties.ToDictionary(x => x.Key, x => ConvertDynamicValue(x.Value))
+                };
+            }
+
+            if (value is IPath path)
+            {
+                return new
+                {
+                    nodes = path.Nodes.Select(x => ConvertDynamicValue(x)).ToList(),
+                    relationships = path.Relationships.Select(x => ConvertDynamicValue(x)).ToList()
+                };
+            }
+
+            if (value is IDictionary<string, object> dict)
+            {
+                return dict.ToDictionary(x => x.Key, x => ConvertDynamicValue(x.Value));
+            }
+
+            if (value is IEnumerable<object> list && value is not string)
+            {
+                return list.Select(x => ConvertDynamicValue(x)).ToList();
+            }
+
+            return value;
         }
     }
 }

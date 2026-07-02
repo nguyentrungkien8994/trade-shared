@@ -65,6 +65,14 @@ public class RepositoryBaseNeo4j : IRepositoryBaseNeo4j
         var results = utils.ParserRecords<T>(records);
         return results;
     }
+
+    public async Task<IEnumerable<dynamic>> SearchDynamicByCypherRawAsync(string cypher)
+    {
+        if (string.IsNullOrWhiteSpace(cypher)) return Enumerable.Empty<dynamic>();
+        var records = await _dataAccess.ReadMultipleNodeAsync(cypher, null);
+        Utils utils = new();
+        return utils.ParserDynamicRecords(records);
+    }
 }
 public class RepositoryBaseNeo4j<T, TId> : RepositoryBaseNeo4j, IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>
 {

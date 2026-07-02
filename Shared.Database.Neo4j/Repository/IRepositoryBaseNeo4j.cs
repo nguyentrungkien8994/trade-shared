@@ -10,6 +10,7 @@ public interface IRepositoryBaseNeo4j : IRepositoryBase
     Task<int> UpSertRelationshipAsync(IEnumerable<Relationship> rels, string fromKey = "id", string toKey = "id");
     Task<object?> SearchNodeAsync(SearchParam searchParam);
     Task<object?> SearchNodeByCypherRawAsync<T>(string cypher);
+    Task<IEnumerable<dynamic>> SearchDynamicByCypherRawAsync(string cypher);
 }
 public interface IRepositoryBaseNeo4j<T, TId>
 {

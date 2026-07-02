@@ -45,6 +45,11 @@ public class ServiceBaseNeo4j : IServiceBaseNeo4j
     {
         return _repositoryBase.SearchNodeByCypherRawAsync<T>(cypher);
     }
+
+    public Task<IEnumerable<dynamic>> SearchDynamicByCypherRawAsync(string cypher)
+    {
+        return _repositoryBase.SearchDynamicByCypherRawAsync(cypher);
+    }
 }
 public class ServiceBaseNeo4j<T, TId, IRepo> : IRepositoryBaseNeo4j<T, TId> where IRepo : IRepositoryBaseNeo4j<T, TId> where T : IEntityKey<TId>
 {

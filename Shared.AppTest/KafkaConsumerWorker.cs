@@ -361,8 +361,9 @@ namespace Shared.AppTest
                 //string json = "{\"node\":\"TaxPayer\",\"filter\":{\"taxCode\":{\"$eq\":\"C\"}},\"relations\":[{\"type\":\"HAS_BUCKET\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}]}";
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}},\"relations\":[{\"type\":\"\",\"direction\":\"out\",\"depth\":{\"min\":1,\"max\":3}}]}";
                 //string json = "{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:1516\"}},\"relations\":[{\"type\":\"HOLD\",\"depth\":{\"min\":1,\"max\":3}}],\"target\":{\"node\":\"SYS_PERSON\",\"filter\":{\"@elementId\":{\"$eq\":\"4:956c80ef-2014-41f2-b04c-07ae8ef32f12:89\"}}}}";
-                SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
-                var c = await _serviceBaseNeo4j.SearchNodeAsync(searchParam);
+                //SearchParam searchParam = JsonConvert.DeserializeObject<SearchParam>(json);
+                //var c = await _serviceBaseNeo4j.SearchNodeByCypherRawAsync<object>("call db.schema.nodeTypeProperties()");
+                var c = await _serviceBaseNeo4j.SearchDynamicByCypherRawAsync("MATCH (n:SYS_PERSON) return n.ID, n.FULLNAME, n.ROLENAME");
                 //var a = 1;
                 //Utils utils = new();
                 //var b = utils.Parse(json);
